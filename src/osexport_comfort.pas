@@ -115,7 +115,7 @@ if tbl_count=0 then begin
    Exit;
 end;
 
-  user_path:=GlobalUnloadPath+PathDelim+'export_comfort'+PathDelim;
+  user_path:=GlobalPath+'unload'+PathDelim+'export_comfort'+PathDelim;
   if directoryexists(user_path)=false then mkdir(user_path);
 
 {T}for kt:=0 to CheckGroup1.Items.Count-1 do begin

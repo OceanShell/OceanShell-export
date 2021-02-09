@@ -4,8 +4,8 @@ object frmExport_COMFORT_table: TfrmExport_COMFORT_table
   Top = 57
   Width = 1172
   Caption = 'frmExport_COMFORT_table'
-  ClientHeight = 0
-  ClientWidth = 0
+  ClientHeight = 895
+  ClientWidth = 1172
   DesignTimePPI = 144
   OnShow = FormShow
   LCLVersion = '2.0.6.0'

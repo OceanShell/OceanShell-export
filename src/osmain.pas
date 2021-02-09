@@ -118,7 +118,7 @@ var
   frmosmain: Tfrmosmain;
 
   IniFileName:string;
-  GlobalPath, GlobalUnloadPath, GlobalSupportPath:string; //global paths for the app
+  GlobalPath:string; //global paths for the app
   CurrentParTable: string;
 
   Source_unq_list:TStringList; //list of unique sources from selection
@@ -360,75 +360,6 @@ try
   SQL_str:=SQL_str+' AND (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) ';
 
 
-    // predefined region
-    if pcRegion.ActivePageIndex=1 then begin
-
-    if cbPredefinedRegion.ItemIndex<0 then
-     if MessageDlg('Choose a region first', mtWarning, [mbOk], 0)=mrOk then exit;
-
-    ArbytraryRegion.GetArbirtaryRegion(
-      GlobalSupportPath+'sea_borders'+PathDelim+cbPredefinedRegion.Text+'.bln',
-      LatMin, LatMax, LonMin, LonMax);
-
- {   showmessage(floattostr(LatMIn)+'   '+
-                floattostr(latmax)+'   '+
-                floattostr(lonmin)+'   '+
-                floattostr(lonmax));  }
-
-      with frmdm.q1 do begin
-       Close;
-         SQL.Clear;
-         SQL.Add(' DELETE FROM TEMPORARY_ID_LIST ');
-       ExecSQL;
-      end;
-      frmdm.TR.CommitRetaining;
-
-      with frmdm.q1 do begin
-       Close;
-         SQL.Clear;
-         SQL.Add(' SELECT ID, LATITUDE, LONGITUDE FROM STATION ');
-         SQL.Add(' WHERE ');
-         SQL.Add(' (LATITUDE BETWEEN ' );
-         SQL.Add(floattostr(LatMin)+' AND ');
-         SQL.Add(floattostr(LatMax)+') AND ');
-         if LonMin<=LonMax then begin
-           SQL.Add(' (LONGITUDE BETWEEN ');
-           SQL.Add(floattostr(LonMin)+' AND ');
-           SQL.Add(floattostr(LonMax)+') ');
-         end;
-         if LonMin>LonMax then begin
-           SQL.Add(' ((LONGITUDE>= ');
-           SQL.Add(floattostr(LonMIn));
-           SQL.Add(' AND LONGITUDE<=180) OR ');
-           SQL.Add('(LONGITUDE>=-180 and LONGITUDE<= ');
-           SQL.Add(floattostr(LonMax)+')) ');
-         end;
-        //   showmessage(frmdm.q1.SQL.Text);
-       Open;
-      end;
-
-      while not frmdm.q1.EOF do begin
-         Lat:=frmdm.q1.FieldByName('LATITUDE').AsFloat;
-         Lon:=frmdm.q1.FieldByName('LONGITUDE').AsFloat;
-
-         if Odd(Point_Status(Lon,Lat)) then begin
-          with frmdm.q2 do begin
-           Close;
-            SQL.Clear;
-            SQL.Add(' INSERT INTO TEMPORARY_ID_LIST ');
-            SQL.Add(' (ID) VALUES (:ID) ');
-            ParamByName('ID').Value:=frmdm.q1.FieldByName('ID').AsInteger;
-           ExecSQL;
-          end;
-         end;
-       frmdm.q1.Next;
-      end;
-      frmdm.TR.CommitRetaining;
-
-      SQL_str:=SQL_str+' AND STATION.ID IN (SELECT ID FROM TEMPORARY_ID_LIST) ';
-    end;
-
-
     (* Date and Time *)
     // From date to date
       if chkPeriod.Checked=false then begin
@@ -515,9 +446,79 @@ try
      SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+'))) ';
     end;
 
-      SQL_str:=SQL_str+' AND (STATION.DUPLICATE=FALSE) ';
+    SQL_str:=SQL_str+' AND (STATION.DUPLICATE=FALSE) ';
 
     if copy(SQL_str, 1, 4)=' AND'   then SQL_str:=Copy(SQL_str, 5, length(SQL_str));
+
+
+        // predefined region
+    if pcRegion.ActivePageIndex=1 then begin
+
+    if cbPredefinedRegion.ItemIndex<0 then
+     if MessageDlg('Choose a region first', mtWarning, [mbOk], 0)=mrOk then exit;
+
+    ArbytraryRegion.GetArbirtaryRegion(
+      GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+cbPredefinedRegion.Text+'.bln',
+      LatMin, LatMax, LonMin, LonMax);
+
+ {   showmessage(floattostr(LatMIn)+'   '+
+                floattostr(latmax)+'   '+
+                floattostr(lonmin)+'   '+
+                floattostr(lonmax));  }
+
+      with frmdm.q1 do begin
+       Close;
+         SQL.Clear;
+         SQL.Add(' DELETE FROM TEMPORARY_ID_LIST ');
+       ExecSQL;
+      end;
+      frmdm.TR.CommitRetaining;
+
+      with frmdm.q1 do begin
+       Close;
+         SQL.Clear;
+         SQL.Add(' SELECT ID, LATITUDE, LONGITUDE FROM STATION ');
+         SQL.Add(' WHERE ');
+         SQL.Add(' (LATITUDE BETWEEN ' );
+         SQL.Add(floattostr(LatMin)+' AND ');
+         SQL.Add(floattostr(LatMax)+') AND ');
+         if LonMin<=LonMax then begin
+           SQL.Add(' (LONGITUDE BETWEEN ');
+           SQL.Add(floattostr(LonMin)+' AND ');
+           SQL.Add(floattostr(LonMax)+') ');
+         end;
+         if LonMin>LonMax then begin
+           SQL.Add(' ((LONGITUDE>= ');
+           SQL.Add(floattostr(LonMIn));
+           SQL.Add(' AND LONGITUDE<=180) OR ');
+           SQL.Add('(LONGITUDE>=-180 and LONGITUDE<= ');
+           SQL.Add(floattostr(LonMax)+')) ');
+         end;
+        // SQL.Add(SQL_str
+        //   showmessage(frmdm.q1.SQL.Text);
+       Open;
+      end;
+
+      while not frmdm.q1.EOF do begin
+         Lat:=frmdm.q1.FieldByName('LATITUDE').AsFloat;
+         Lon:=frmdm.q1.FieldByName('LONGITUDE').AsFloat;
+
+         if Odd(Point_Status(Lon,Lat)) then begin
+          with frmdm.q2 do begin
+           Close;
+            SQL.Clear;
+            SQL.Add(' INSERT INTO TEMPORARY_ID_LIST ');
+            SQL.Add(' (ID) VALUES (:ID) ');
+            ParamByName('ID').Value:=frmdm.q1.FieldByName('ID').AsInteger;
+           ExecSQL;
+          end;
+         end;
+       frmdm.q1.Next;
+      end;
+      frmdm.TR.CommitRetaining;
+
+      SQL_str:=SQL_str+' AND STATION.ID IN (SELECT ID FROM TEMPORARY_ID_LIST) ';
+    end;
 
    if frmdm.TR.Active=true then frmdm.TR.Commit;
    with frmdm.Q do begin
@@ -749,7 +750,7 @@ Var
 begin
 fdb.Name:='';
 cbPredefinedRegion.Clear;
- FindFirst(GlobalSupportPath+'sea_borders'+PathDelim+'*.bln',faAnyFile, fdb);
+ FindFirst(GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+'*.bln',faAnyFile, fdb);
   if fdb.Name<>'' then begin
    fname:=ExtractFileName(fdb.Name);
     cbPredefinedRegion.Items.Add(copy(fname,1, length(fname)-4));

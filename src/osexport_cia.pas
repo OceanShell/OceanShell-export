@@ -384,7 +384,7 @@ column[102]:='chlaf';
     memo1.Lines.Add('Latitude : '+floattostr(SLatMin)+'->'+floattostr(SLatMax));
     memo1.Lines.Add('Longitude: '+floattostr(SLonMin)+'->'+floattostr(SLonMax));
 
-    user_path:=GlobalUnloadPath+PathDelim+'export'+PathDelim;
+    user_path:=GlobalPath+'unload'+PathDelim+'export'+PathDelim;
     if directoryexists(user_path)=false then mkdir(user_path);
     fn:=user_path+'expocode.csv';
     memo1.Lines.Add(fn);
