@@ -35,6 +35,7 @@ src/lib/
 
 # OceanShell specific files and folders
 *.nc
+database.ini
 OceanShell
 data/
 distrib/
