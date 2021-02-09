@@ -1,0 +1,85 @@
+object frmdm: Tfrmdm
+  OnDestroy = DataModuleDestroy
+  OldCreateOrder = False
+  Height = 201
+  HorizontalOffset = 743
+  VerticalOffset = 362
+  Width = 590
+  PPI = 144
+  object IBDB: TIBConnection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    Password = 'masterkey'
+    Transaction = TR
+    UserName = 'SYSDBA'
+    LogEvents = []
+    CheckTransactionParams = False
+    left = 36
+    top = 24
+  end
+  object TR: TSQLTransaction
+    Active = False
+    Action = caNone
+    Database = IBDB
+    left = 96
+    top = 24
+  end
+  object Q: TSQLQuery
+    MaxIndexesCount = 100
+    FieldDefs = <>
+    Database = IBDB
+    Transaction = TR
+    Params = <>
+    left = 160
+    top = 24
+  end
+  object DS: TDataSource
+    DataSet = Q
+    left = 224
+    top = 24
+  end
+  object q1: TSQLQuery
+    MaxIndexesCount = 100
+    FieldDefs = <>
+    Database = IBDB
+    Transaction = TR
+    Params = <>
+    left = 328
+    top = 24
+  end
+  object q2: TSQLQuery
+    MaxIndexesCount = 100
+    FieldDefs = <>
+    Database = IBDB
+    Transaction = TR
+    Params = <>
+    left = 392
+    top = 24
+  end
+  object q3: TSQLQuery
+    MaxIndexesCount = 100
+    FieldDefs = <>
+    Database = IBDB
+    Transaction = TR
+    Params = <>
+    left = 456
+    top = 24
+  end
+  object DBLoader: TSQLDBLibraryLoader
+    Enabled = False
+    ConnectionType = 'Firebird'
+    LibraryName = 'fbclient.dll'
+    left = 36
+    top = 104
+  end
+  object QCruise: TSQLQuery
+    MaxIndexesCount = 100
+    FieldDefs = <>
+    Database = IBDB
+    Transaction = TR
+    Params = <>
+    left = 160
+    top = 112
+  end
+end
