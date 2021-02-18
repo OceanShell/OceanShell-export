@@ -35,12 +35,14 @@ type
     btnSelect: TBitBtn;
     cbCountry: TCheckComboBox;
     cbInstitute: TCheckComboBox;
+    cbCruise: TCheckComboBox;
     cbPlatform: TCheckComboBox;
     cbPredefinedRegion: TComboBox;
     cbProject: TCheckComboBox;
     cbSource: TCheckComboBox;
     chkNOTCountry: TCheckBox;
     chkNOTInstitute: TCheckBox;
+    chkNOTCruise: TCheckBox;
     chkNOTPlatform: TCheckBox;
     chkNOTProject: TCheckBox;
     chkNOTSource: TCheckBox;
@@ -52,7 +54,9 @@ type
     gbRegion: TGroupBox;
     lbResetSearchStations: TLabel;
     iMeteo: TMenuItem;
-    MenuItem1: TMenuItem;
+    btnExportASCII: TMenuItem;
+    btnExportHDB: TMenuItem;
+    btnExportNetCDF: TMenuItem;
     Panel1: TPanel;
     pcRegion: TPageControl;
     ODir: TSelectDirectoryDialog;
@@ -73,9 +77,11 @@ type
     ToolButton1: TToolButton;
     btnExport: TToolButton;
 
+    procedure cbCruiseDropDown(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 
     procedure btnMapClick(Sender: TObject);
-    procedure btnShowMapClick(Sender: TObject);
     procedure btnSelectClick(Sender: TObject);
     procedure cbCountryDropDown(Sender: TObject);
     procedure cbInstituteDropDown(Sender: TObject);
@@ -84,13 +90,12 @@ type
     procedure cbProjectDropDown(Sender: TObject);
     procedure cbSourceDropDown(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure iExportCIAClick(Sender: TObject);
-    procedure iExportCOMFORTClick(Sender: TObject);
+
     procedure lbResetSearchStationsClick(Sender: TObject);
-    procedure MenuItem1Click(Sender: TObject);
+    procedure btnExportASCIIClick(Sender: TObject);
+    procedure btnExportHDBClick(Sender: TObject);
+    procedure btnExportNetCDFClick(Sender: TObject);
 
   private
     procedure DatabaseInfo;
@@ -121,13 +126,13 @@ var
   GlobalPath:string; //global paths for the app
   CurrentParTable: string;
 
-  Source_unq_list:TStringList; //list of unique sources from selection
+{  Source_unq_list:TStringList; //list of unique sources from selection
   Instrument_list: TStringList; // list of instruments
   PQF1_list: TStringList; // list for PQF1
   PQF2_list: TStringList; // list for PQF2
   SQF_list : TStringList; // list for SQF
 
-  depth_units: integer; //0-meters, 1-dBar
+  depth_units: integer; //0-meters, 1-dBar }
 
   StationIDMin, StationIDMax: integer;
   StationLatMin,StationLatMax,StationLonMin,StationLonMax: real;
@@ -136,27 +141,16 @@ var
   StationDateAddedMin, StationDateAddedMax, StationDateUpdatedMin, StationDateUpdatedMax :TDateTime;
   StationCount, SCount:Integer; //number OD stations in database and selection
 
-  CruiseIDMin, CruiseIDMax:integer;
-  CruiseLatMin,CruiseLatMax,CruiseLonMin,CruiseLonMax: real;
-  CruiseDateAddedMin, CruiseDateAddedMax :TDateTime;
-  CruiseDateUpdatedMin, CruiseDateUpdatedMax :TDateTime;
-  CruiseStationsTotalMax, CruiseStationsDatabaseMax, CruiseStationsDuplicateMax: integer;
-
   CRUISEInfoObtained: boolean = false; //getting CRUISE info on app start
   NavigationOrder:boolean=true; //Stop navigation until all modules responded
 
   libgswteos, netcdf:TLibHandle;
   libgswteos_exists, netcdf_exists:boolean;
 
-  SLatP_arr:array[0..20000] of real;
-  SLonP_arr:array[0..20000] of real;
   Length_arr:integer;
-
   MapDataset: array of MapDS;
 
-  frmprofile_station_all_open, frmprofile_station_single_open :boolean;
-  frmmap_open, frmprofile_plot_all_open, frmparameters_list_open: boolean;
-  frmmeteo_open: boolean;
+  frmmap_open :boolean;
 
 const
    NC_NOWRITE   = 0;    // file for reading
@@ -182,9 +176,9 @@ uses
   ArbytraryRegion,
 
 (* data export *)
-  osexport_CIA,
-  osexport_comfort,
   osexport_comfort_table,
+  osexport_hdb,
+  osexport_netcdf,
 
 (* tools *)
   osmap
@@ -233,18 +227,20 @@ begin
 
   try
     with frmdm.IBDB do begin
+      Params.Clear;
       Connected:=false;
       UserName:=DBUser;
       Password:=DBPass;
       HostName:=DBHost;
       DatabaseName:=DBPath;
+      Params.Add('WireCompression=true');
+      Connected:=true;
     end;
   except
     on e: Exception do
       if MessageDlg(e.message, mtError, [mbOk], 0)=mrOk then close;
   end;
 end;
-
 
 
 procedure Tfrmosmain.FormShow(Sender: TObject);
@@ -327,7 +323,7 @@ procedure Tfrmosmain.btnSelectClick(Sender: TObject);
 var
 i, k, fl:integer;
 SSYearMin,SSYearMax,SSMonthMin,SSMonthMax,SSDayMin,SSDayMax :Word;
-NotCondCountry, NotCondPlatform, NotCondSource:string;
+NotCondCountry, NotCondPlatform, NotCondSource, NotCondCruise:string;
 NotCondInstitute, NotCondProject, NotCondOrigin, SBordersFile:string;
 
 dlat, dlon, lat, lon, dist:real;
@@ -351,6 +347,7 @@ try
   if chkNOTCountry.Checked   =true then NotCondCountry   :='NOT' else NotCondCountry   :='';
   if chkNOTPlatform.Checked  =true then NotCondPlatform  :='NOT' else NotCondPlatform  :='';
   if chkNOTSource.Checked    =true then NotCondSource    :='NOT' else NotCondSource    :='';
+  if chkNOTCruise.Checked    =true then NotCondCruise    :='NOT' else NotCondCruise    :='';
   if chkNOTInstitute.Checked =true then NotCondInstitute :='NOT' else NotCondInstitute :='';
   if chkNOTProject.Checked   =true then NotCondProject   :='NOT' else NotCondProject   :='';
 
@@ -358,6 +355,20 @@ try
 
 
   SQL_str:=SQL_str+' AND (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) ';
+
+  if pcRegion.ActivePageIndex=0 then begin
+    SQL_str:=SQL_str+' AND (LATITUDE BETWEEN '+seLatMin.Text+
+                     ' AND '+seLatMax.Text+') ';
+
+     if seLonMax.Value>=seLonMin.Value then
+       SQL_str:=SQL_str+' AND (LONGITUDE BETWEEN '+seLonMin.Text+
+                        ' AND '+seLonMax.Text+') ';
+
+     if seLonMax.Value<seLonMin.Value then
+      SQL_str:=SQL_str+' AND ((LONGITUDE>='+seLonMin.Text+
+                       ' AND LONGITUDE<=180) OR '+
+                       '(LONGITUDE>=-180 and LONGITUDE<='+seLonMax.Text+')) ';
+    end;
 
 
     (* Date and Time *)
@@ -394,8 +405,17 @@ try
                           IntToStr(SSDayMax)+')) ';
     end;
 
+    if trim(cbSource.Text)<>'' then begin
+     SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
+          ' CRUISE, SOURCE WHERE CRUISE.SOURCE_ID=SOURCE.ID AND '+
+          NotCondSource+' SOURCE.NAME IN (';
+       for k:=0 to cbSource.Count-1 do
+         if cbSource.Checked[k]=true then
+          SQL_str:=SQL_str+QuotedStr(cbSource.Items.Strings[k])+',';
+     SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+'))) ';
+    end;
 
-    if cbPlatform.Text<>'' then begin
+    if trim(cbPlatform.Text)<>'' then begin
       SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
       ' CRUISE, PLATFORM WHERE CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
       NotCondSource+' PLATFORM.NAME IN (';
@@ -405,7 +425,7 @@ try
        SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+'))) ';
     end;
 
-    if cbCountry.Text<>'' then begin
+    if trim(cbCountry.Text)<>'' then begin
       SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
       ' CRUISE, PLATFORM, COUNTRY WHERE CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
       ' PLATFORM.COUNTRY_ID=COUNTRY.ID AND '+NotCondSource+
@@ -416,17 +436,17 @@ try
        SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+'))) ';
     end;
 
-    if cbSource.Text<>'' then begin
+    if trim(cbCruise.Text)<>'' then begin
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-          ' CRUISE, SOURCE WHERE CRUISE.SOURCE_ID=SOURCE.ID AND '+
-          NotCondSource+' SOURCE.NAME IN (';
-       for k:=0 to cbSource.Count-1 do
-         if cbSource.Checked[k]=true then
-          SQL_str:=SQL_str+QuotedStr(cbSource.Items.Strings[k])+',';
+          ' CRUISE WHERE '+
+          NotCondSource+' CRUISE.CRUISE_NUMBER IN (';
+       for k:=0 to cbCruise.Count-1 do
+         if cbCruise.Checked[k]=true then
+          SQL_str:=SQL_str+QuotedStr(cbCruise.Items.Strings[k])+',';
      SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+'))) ';
     end;
 
-    if cbInstitute.Text<>'' then begin
+    if trim(cbInstitute.Text)<>'' then begin
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
           ' CRUISE, INSTITUTE WHERE CRUISE.INSTITUTE_ID=INSTITUTE.ID AND '+
           NotCondSource+' INSTITUTE.NAME IN (';
@@ -436,7 +456,7 @@ try
      SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+'))) ';
     end;
 
-    if cbProject.Text<>'' then begin
+    if trim(cbProject.Text)<>'' then begin
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
           ' CRUISE, PROJECT WHERE CRUISE.PROJECT_ID=PROJECT.ID AND '+
           NotCondSource+' PROJECT.NAME IN (';
@@ -451,20 +471,16 @@ try
     if copy(SQL_str, 1, 4)=' AND'   then SQL_str:=Copy(SQL_str, 5, length(SQL_str));
 
 
-        // predefined region
+    // predefined region
     if pcRegion.ActivePageIndex=1 then begin
 
-    if cbPredefinedRegion.ItemIndex<0 then
-     if MessageDlg('Choose a region first', mtWarning, [mbOk], 0)=mrOk then exit;
+       if cbPredefinedRegion.ItemIndex<0 then
+        if MessageDlg('Choose a region first', mtWarning, [mbOk], 0)=mrOk then exit;
 
-    ArbytraryRegion.GetArbirtaryRegion(
-      GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+cbPredefinedRegion.Text+'.bln',
+      ArbytraryRegion.GetArbirtaryRegion(
+      GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+
+      cbPredefinedRegion.Text+'.bln',
       LatMin, LatMax, LonMin, LonMax);
-
- {   showmessage(floattostr(LatMIn)+'   '+
-                floattostr(latmax)+'   '+
-                floattostr(lonmin)+'   '+
-                floattostr(lonmax));  }
 
       with frmdm.q1 do begin
        Close;
@@ -482,42 +498,44 @@ try
          SQL.Add(' (LATITUDE BETWEEN ' );
          SQL.Add(floattostr(LatMin)+' AND ');
          SQL.Add(floattostr(LatMax)+') AND ');
-         if LonMin<=LonMax then begin
+         if LonMax<=180 then begin
            SQL.Add(' (LONGITUDE BETWEEN ');
            SQL.Add(floattostr(LonMin)+' AND ');
            SQL.Add(floattostr(LonMax)+') ');
          end;
-         if LonMin>LonMax then begin
+         if LonMax>180 then begin
            SQL.Add(' ((LONGITUDE>= ');
-           SQL.Add(floattostr(LonMIn));
+           SQL.Add(floattostr(LonMin));
            SQL.Add(' AND LONGITUDE<=180) OR ');
            SQL.Add('(LONGITUDE>=-180 and LONGITUDE<= ');
            SQL.Add(floattostr(LonMax)+')) ');
          end;
-        // SQL.Add(SQL_str
-        //   showmessage(frmdm.q1.SQL.Text);
+         SQL.Add(' AND '+SQL_str);
+      // showmessage(frmdm.q1.SQL.Text);
        Open;
       end;
 
-      while not frmdm.q1.EOF do begin
-         Lat:=frmdm.q1.FieldByName('LATITUDE').AsFloat;
-         Lon:=frmdm.q1.FieldByName('LONGITUDE').AsFloat;
+    //  showmessage(inttostr(frmdm.q1.RecordCount));
 
-         if Odd(Point_Status(Lon,Lat)) then begin
+      while not frmdm.q1.EOF do begin
+         Lat:=frmdm.q1.FieldByName('LATITUDE').Value;
+         Lon:=frmdm.q1.FieldByName('LONGITUDE').Value;
+
+         if (Odd(Point_Status(Lon,Lat))) then begin
+         // memo2.lines.add(floattostr(lat)+'   '+floattostr(lon));
           with frmdm.q2 do begin
            Close;
             SQL.Clear;
             SQL.Add(' INSERT INTO TEMPORARY_ID_LIST ');
             SQL.Add(' (ID) VALUES (:ID) ');
-            ParamByName('ID').Value:=frmdm.q1.FieldByName('ID').AsInteger;
+            ParamByName('ID').Value:=frmdm.q1.FieldByName('ID').Value;
            ExecSQL;
           end;
          end;
        frmdm.q1.Next;
       end;
       frmdm.TR.CommitRetaining;
-
-      SQL_str:=SQL_str+' AND STATION.ID IN (SELECT ID FROM TEMPORARY_ID_LIST) ';
+      SQL_str:=' STATION.ID IN (SELECT ID FROM TEMPORARY_ID_LIST) ';
     end;
 
    if frmdm.TR.Active=true then frmdm.TR.Commit;
@@ -532,8 +550,8 @@ try
      SQL.Add('ORDER BY DATEANDTIME ');
 
      (* Show the query before executing *)
-    //  if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
-     //               mtInformation, [mbYes, mbNo],0)=mrNo then exit;
+  {  if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
+                  mtInformation, [mbYes, mbNo],0)=mrNo then exit;  }
     Open;
    end;
 
@@ -765,13 +783,15 @@ end;
 procedure Tfrmosmain.cbPlatformDropDown(Sender: TObject);
 begin
   PopulatePlatformList;
+  cbCruise.Clear;
 end;
 
 procedure Tfrmosmain.PopulatePlatformList;
 Var
   TRt:TSQLTransaction;
   Qt:TSQLQuery;
-  pp: integer;
+  pp, k: integer;
+  SQL_str:string;
 begin
  if cbPlatform.Count>0 then exit;
 
@@ -783,11 +803,29 @@ begin
    Qt.Database:=frmdm.IBDB;
    Qt.Transaction:=TRt;
 
-   cbPlatform.Clear;
+   if cbCountry.Text='' then begin
+     Qt.Close;
+     Qt.SQL.Text:=' SELECT DISTINCT NAME FROM PLATFORM ORDER BY NAME ';
+     Qt.Open;
+   end;
 
-   Qt.Close;
-   Qt.SQL.Text:=' SELECT DISTINCT NAME FROM PLATFORM ORDER BY NAME ';
-   Qt.Open;
+   if cbCountry.Text<>'' then begin
+    With Qt do begin
+     Close;
+       SQL.Add(' SELECT DISTINCT NAME FROM PLATFORM ');
+       SQL.Add(' WHERE COUNTRY_ID IN (SELECT ID FROM COUNTRY ');
+       SQL.Add(' WHERE COUNTRY.NAME IN ( ');
+       SQL_str:='';
+       for k:=0 to cbCountry.Count-1 do
+         if cbCountry.Checked[k]=true then
+          SQL_str:=SQL_str+QuotedStr(cbCountry.Items.Strings[k])+',';
+          SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+')) ';
+       SQL.Add(SQL_str);
+       SQL.Add(' ORDER BY NAME ');
+     //  showmessage(SQL.Text);
+     Qt.Open;
+    end;
+   end;
 
    while not Qt.Eof do begin
      cbPlatform.AddItem(Qt.Fields[0].AsString, cbUnchecked, true);
@@ -800,15 +838,70 @@ begin
    Qt.Free;
    TrT.Free;
   end;
-
-{  cbCruisePlatform.Clear;
-  for pp:=0 to cbPlatform.Count-1 do
-     cbCruisePlatform.AddItem(cbPlatform.Items.Strings[pp], cbUnchecked, true);}
 end;
+
+
+procedure Tfrmosmain.cbCruiseDropDown(Sender: TObject);
+Var
+  TRt:TSQLTransaction;
+  Qt:TSQLQuery;
+  pp, k: integer;
+  SQL_str:string;
+begin
+ if cbCruise.Count>0 then exit;
+
+  try
+   TRt:=TSQLTransaction.Create(self);
+   TRt.DataBase:=frmdm.IBDB;
+
+   Qt:=TSQLQuery.Create(self);
+   Qt.Database:=frmdm.IBDB;
+   Qt.Transaction:=TRt;
+
+
+   if cbPlatform.Text='' then begin
+     Qt.Close;
+     Qt.SQL.Text:=' SELECT DISTINCT CRUISE_NUMBER FROM CRUISE ORDER BY CRUISE_NUMBER ';
+     Qt.Open;
+   end;
+
+   if cbPlatform.Text<>'' then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT CRUISE_NUMBER FROM CRUISE ');
+       SQL.Add(' WHERE PLATFORM_ID IN (SELECT ID FROM PLATFORM ');
+       SQL.Add(' WHERE PLATFORM.NAME IN ( ');
+       SQL_str:='';
+       for k:=0 to cbPlatform.Count-1 do
+               if cbPlatform.Checked[k]=true then
+                SQL_str:=SQL_str+QuotedStr(cbPlatform.Items.Strings[k])+',';
+          SQL_str:=copy(SQL_str, 1, length(SQL_str)-1)+')) ';
+       SQL.Add(SQL_str);
+       SQL.Add(' ORDER BY CRUISE_NUMBER ');
+     //  showmessage(SQL.Text);
+     Qt.Open;
+    end;
+   end;
+
+   while not Qt.Eof do begin
+     cbCruise.AddItem(Qt.Fields[0].AsString, cbUnchecked, true);
+    Qt.Next;
+   end;
+
+    Qt.Close;
+    TRt.Commit;
+  finally
+   Qt.Free;
+   TrT.Free;
+  end;
+end;
+
 
 procedure Tfrmosmain.cbCountryDropDown(Sender: TObject);
 begin
   PopulateCountryList;
+  cbPlatform.Clear;
 end;
 
 procedure Tfrmosmain.PopulateCOUNTRYList;
@@ -848,17 +941,11 @@ begin
    Qt.Free;
    TrT.Free;
   end;
-
- {  cbCruiseCountry.Clear;
-   for pp:=0 to cbCountry.Count-1 do
-     cbCruiseCountry.AddItem(cbCountry.Items.Strings[pp], cbUnchecked, true);
-  }
 end;
 
 procedure Tfrmosmain.cbSourceDropDown(Sender: TObject);
 begin
   PopulateSourceList;
- // cbCruiseCruiseNum.Clear;
 end;
 
 
@@ -1016,31 +1103,7 @@ if NavigationOrder=false then exit;
  end;
 end;
 
-
-procedure Tfrmosmain.iExportCIAClick(Sender: TObject);
-begin
-  frmExport_CIA := TfrmExport_CIA.Create(Self);
-   try
-    if not frmExport_CIA.ShowModal = mrOk then exit;
-   finally
-     frmExport_CIA.Free;
-     frmExport_CIA := nil;
-   end;
-end;
-
-procedure Tfrmosmain.iExportCOMFORTClick(Sender: TObject);
-begin
-  frmExport_COMFORT := TfrmExport_COMFORT.Create(Self);
-   try
-    if not frmExport_COMFORT.ShowModal = mrOk then exit;
-   finally
-     frmExport_COMFORT.Free;
-     frmExport_COMFORT := nil;
-   end;
-end;
-
-
-procedure Tfrmosmain.MenuItem1Click(Sender: TObject);
+procedure Tfrmosmain.btnExportASCIIClick(Sender: TObject);
 begin
   frmExport_COMFORT_table := TfrmExport_COMFORT_table.Create(Self);
    try
@@ -1048,6 +1111,28 @@ begin
    finally
      frmExport_COMFORT_table.Free;
      frmExport_COMFORT_table := nil;
+   end;
+end;
+
+procedure Tfrmosmain.btnExportHDBClick(Sender: TObject);
+begin
+  frmexport_hdb := Tfrmexport_hdb.Create(Self);
+   try
+    if not frmexport_hdb.ShowModal = mrOk then exit;
+   finally
+     frmexport_hdb.Free;
+     frmexport_hdb := nil;
+   end;
+end;
+
+procedure Tfrmosmain.btnExportNetCDFClick(Sender: TObject);
+begin
+  frmexport_netcdf := Tfrmexport_netcdf.Create(Self);
+   try
+    if not frmexport_netcdf.ShowModal = mrOk then exit;
+   finally
+     frmexport_netcdf.Free;
+     frmexport_netcdf := nil;
    end;
 end;
 
@@ -1060,11 +1145,6 @@ begin
     end;
   frmmap.btnShowAllStationsClick(self);
   frmmap_open:=true;
-end;
-
-procedure Tfrmosmain.btnShowMapClick(Sender: TObject);
-begin
-
 end;
 
 

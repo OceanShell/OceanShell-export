@@ -118,29 +118,28 @@
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="osexport_cia.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmExport_CIA"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="osExport_CIA"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="osexport_comfort.pas"/>
-        <IsPartOfProject Value="True"/>
-        <HasResources Value="True"/>
-      </Unit15>
-      <Unit16>
         <Filename Value="osexport_comfort_table.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmExport_COMFORT_table"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit16>
-      <Unit17>
+      </Unit14>
+      <Unit15>
         <Filename Value="gibbsseawater.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="GibbsSeaWater"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="osexport_hdb.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmexport_hdb"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="osexport_netcdf.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmexport_netcdf"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit17>
     </Units>
   </ProjectOptions>
