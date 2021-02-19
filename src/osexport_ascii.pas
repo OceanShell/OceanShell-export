@@ -1,81 +1,21 @@
-unit osexport_comfort_table;
+unit osexport_ascii;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Buttons;
+  Classes, SysUtils, Dialogs,
 
-type
+  // program modules
+  osmain, dm, osexport, osunitsconversion;
 
-  { TfrmExport_COMFORT_table }
 
-  TfrmExport_COMFORT_table = class(TForm)
-    btnExport: TBitBtn;
-    btnSelectAll: TBitBtn;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckGroup1: TCheckGroup;
-    Edit1: TEdit;
-    Edit2: TEdit;
-    Edit3: TEdit;
-    GroupBox1: TGroupBox;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Memo1: TMemo;
-    procedure btnExportClick(Sender: TObject);
-    procedure btnSelectAllClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-  private
-    procedure qf_ocean_to_woce(qf_ocean:integer; var qf_woce:integer);
-
-  public
-
-  end;
-
-var
-  frmExport_COMFORT_table: TfrmExport_COMFORT_table;
-  user_path :string;
-  fo :text;
+procedure ExportASCII(user_path:string);
 
 implementation
 
-uses osmain, dm, osunitsconversion;
-
-{$R *.lfm}
-
-{ TfrmExport_COMFORT_table }
-
-procedure TfrmExport_COMFORT_table.FormShow(Sender: TObject);
-begin
-  memo1.Clear;
-  CheckGroup1.items:=frmosmain.ListBox1.Items;
-end;
-
-
-
-procedure TfrmExport_COMFORT_table.btnSelectAllClick(Sender: TObject);
-  var
-i: integer;
-begin
-  if btnSelectAll.Caption='Select all' then begin
-    for i:=0 to CheckGroup1.Items.Count-1 do CheckGroup1.Checked[i]:=true;
-    btnSelectAll.Caption:='Deselect all';
-    Exit;
-  end;
-  if btnSelectAll.Caption='Deselect all' then begin
-    for i:=0 to CheckGroup1.Items.Count-1 do CheckGroup1.Checked[i]:=false;
-    btnSelectAll.Caption:='Select all';
-    Exit;
-  end;
-end;
-
-
-procedure TfrmExport_COMFORT_table.qf_ocean_to_woce(qf_ocean:integer; var qf_woce:integer);
+procedure qf_ocean_to_woce(qf_ocean:integer; var qf_woce:integer);
 begin
     {WOCE flags according Table 1 in GLODAP article}
     if qf_ocean =-9999 then qf_woce:=9; //there is no sample -> data not received/not used/sample not drawn/no data
@@ -87,8 +27,7 @@ begin
 end;
 
 
-
-procedure TfrmExport_COMFORT_table.btnExportClick(Sender: TObject);
+procedure ExportASCII(user_path:string);
 var
 kt,ks,mik, ID, cnt: integer;
 Lat, Lon:real;
@@ -105,18 +44,11 @@ DT1,DT2: TDateTime;
 lev_dbar,lev_m,val,valerr,val_conv1,val_conv2 :real;
 PQF1,PQF2,SQF,WQF :integer;
 btl_num,units_id,instr_id,prf_num,prf_best :integer;
-
+fo: text;
 begin
-
-  if frmosmain.ODir.Execute then user_path:=frmosmain.ODir.FileName+PathDelim else exit;
-
-  DT1:=NOW;
-  memo1.Lines.Add('...start [export]: '+datetimetostr(DT1));
-
-
   tbl_count:=0;
-{T}for kt:=0 to CheckGroup1.Items.Count-1 do begin
-{TC}if CheckGroup1.Checked[kt] then begin
+{T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
+{TC}if frmexport.CheckGroup1.Checked[kt] then begin
   tbl_count:=tbl_count+1;
 {TC}end;
 {T} end;
@@ -128,14 +60,14 @@ end;
 
 try
  frmdm.Q.DisableControls;
-{T}for kt:=0 to CheckGroup1.Items.Count-1 do begin
-{C}if CheckGroup1.Checked[kt] then begin
+{T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
+{C}if frmexport.CheckGroup1.Checked[kt] then begin
 
-   Edit1.Text:='';
-   Edit2.Text:='';
+  // Edit1.Text:='';
+  // Edit2.Text:='';
 
-   tbl:=CheckGroup1.Items.Strings[kt]; {selected table}
-   memo1.Lines.Add(tbl);
+   tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
+  // memo1.Lines.Add(tbl);
 
    {...default unit values to be converted}
    with frmdm.q2 do begin
@@ -160,7 +92,7 @@ try
      Close;
    end;
 
-   memo1.Lines.Add('default units: '+inttostr(units_def)+' ('+units_name+')');
+   //memo1.Lines.Add('default units: '+inttostr(units_def)+' ('+units_name+')');
 
 //   if mik=1 then convert:=false else convert:=true;
 //   if convert=false then memo1.Lines.Add('Units conversion is not required');
@@ -252,12 +184,13 @@ try
    if units_id<>units_def then begin
 
      isconverted:=false;
-{ICES}if CheckBox1.Checked then
+     //ICES
      getdefaultunits(tbl,units_id,units_def,val,val_conv1,isconverted);
 
-{advanced}if CheckBox2.Checked then begin
-     GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv2,isconverted);
-{advanced}end;
+    //Advanced
+ //   if CheckBox2.Checked then
+ //    GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv2,isconverted);
+
    end;
 
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
@@ -297,7 +230,7 @@ try
    +#9+floattostrF(val_conv2,ffFixed,12,5));
 
 
-{PQF2}if PQF2>=strtoint(Edit3.Text) then begin
+{PQF2}if PQF2>=3 then begin
   if val_conv1<>-9999 then begin
     conv1_count:=conv1_count+1;
     conv1_md:=conv1_md+val_conv1;
@@ -326,11 +259,6 @@ try
 finally
   frmdm.Q.EnableControls;
 end;
-
-  DT2:=NOW;
-  memo1.Lines.Add('');
-  memo1.Lines.Add('...stop: '+datetimetostr(DT2));
-  memo1.Lines.Add('...time spent: '+timetostr(DT2-DT1));
 
 end;
 

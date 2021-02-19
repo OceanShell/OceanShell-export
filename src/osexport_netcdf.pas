@@ -5,22 +5,16 @@ unit osexport_netcdf;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils;
 
-type
-  Tfrmexport_netcdf = class(TForm)
-  private
-
-  public
-
-  end;
-
-var
-  frmexport_netcdf: Tfrmexport_netcdf;
+procedure ExportNetCDF(user_path:string);
 
 implementation
 
-{$R *.lfm}
+procedure ExportNetCDF(user_path:string);
+begin
+  //
+end;
 
 end.
 

@@ -1,7 +1,7 @@
 object frmosmain: Tfrmosmain
-  Left = 234
+  Left = 294
   Height = 758
-  Top = 130
+  Top = 135
   Width = 1380
   Caption = 'COMFORT Export'
   ClientHeight = 758
@@ -428,96 +428,6 @@ object frmosmain: Tfrmosmain
       ParentFont = False
       TabOrder = 4
     end
-    object cbSource: TCheckComboBox
-      Left = 184
-      Height = 26
-      Top = 19
-      Width = 680
-      DropDownCount = 12
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ItemHeight = 20
-      OnDropDown = cbSourceDropDown
-      ParentFont = False
-      TabOrder = 5
-    end
-    object cbPlatform: TCheckComboBox
-      Left = 184
-      Height = 26
-      Top = 96
-      Width = 680
-      DropDownCount = 12
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ItemHeight = 20
-      OnDropDown = cbPlatformDropDown
-      ParentFont = False
-      TabOrder = 6
-    end
-    object cbCountry: TCheckComboBox
-      Left = 184
-      Height = 26
-      Top = 58
-      Width = 680
-      DropDownCount = 12
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ItemHeight = 20
-      OnDropDown = cbCountryDropDown
-      ParentFont = False
-      TabOrder = 7
-    end
-    object cbInstitute: TCheckComboBox
-      Left = 184
-      Height = 26
-      Top = 176
-      Width = 680
-      DropDownCount = 12
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ItemHeight = 20
-      OnDropDown = cbInstituteDropDown
-      ParentFont = False
-      TabOrder = 8
-    end
-    object cbProject: TCheckComboBox
-      Left = 184
-      Height = 26
-      Top = 216
-      Width = 680
-      DropDownCount = 12
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ItemHeight = 20
-      OnDropDown = cbProjectDropDown
-      ParentFont = False
-      TabOrder = 9
-    end
-    object cbCruise: TCheckComboBox
-      Left = 184
-      Height = 26
-      Top = 136
-      Width = 680
-      DropDownCount = 12
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ItemHeight = 20
-      OnDropDown = cbCruiseDropDown
-      ParentFont = False
-      TabOrder = 10
-    end
     object chkNOTCruise: TCheckBox
       Left = 25
       Height = 29
@@ -528,48 +438,116 @@ object frmosmain: Tfrmosmain
       Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentFont = False
+      TabOrder = 5
+    end
+    object cbSource: TComboBox
+      Left = 184
+      Height = 28
+      Top = 17
+      Width = 680
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ItemHeight = 20
+      OnDropDown = cbSourceDropDown
+      ParentFont = False
+      TabOrder = 6
+      Text = 'cbSource'
+    end
+    object cbCountry: TComboBox
+      Left = 184
+      Height = 28
+      Top = 57
+      Width = 680
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ItemHeight = 20
+      OnDropDown = cbCountryDropDown
+      ParentFont = False
+      TabOrder = 7
+      Text = 'cbCountry'
+    end
+    object cbPlatform: TComboBox
+      Left = 184
+      Height = 28
+      Top = 97
+      Width = 680
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ItemHeight = 20
+      OnDropDown = cbPlatformDropDown
+      ParentFont = False
+      TabOrder = 8
+      Text = 'cbPlatform'
+    end
+    object cbCruise: TComboBox
+      Left = 184
+      Height = 28
+      Top = 136
+      Width = 680
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ItemHeight = 20
+      OnDropDown = cbCruiseDropDown
+      ParentFont = False
+      TabOrder = 9
+      Text = 'cbCruise'
+    end
+    object cbInstitute: TComboBox
+      Left = 184
+      Height = 28
+      Top = 176
+      Width = 680
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ItemHeight = 20
+      OnDropDown = cbInstituteDropDown
+      ParentFont = False
+      TabOrder = 10
+      Text = 'cbInstitute'
+    end
+    object cbProject: TComboBox
+      Left = 184
+      Height = 28
+      Top = 214
+      Width = 680
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ItemHeight = 20
+      OnDropDown = cbProjectDropDown
+      ParentFont = False
       TabOrder = 11
+      Text = 'cbProject'
     end
   end
-  object ToolBar1: TToolBar
+  object btnMap: TBitBtn
     Left = 944
-    Height = 49
-    Top = 223
+    Height = 45
+    Top = 216
     Width = 208
-    Align = alNone
-    AutoSize = True
-    ButtonHeight = 45
-    ButtonWidth = 90
-    Caption = 'ToolBar1'
-    EdgeBorders = [ebLeft, ebTop, ebRight, ebBottom]
+    Caption = 'Show Map'
+    Enabled = False
     Images = frmicons.IL1
-    List = True
-    ShowCaptions = True
+    ImageIndex = 984
+    OnClick = btnMapClick
     TabOrder = 6
-    object btnMap: TToolButton
-      Left = 3
-      Top = 2
-      Caption = 'Map'
-      Enabled = False
-      ImageIndex = 984
-      OnClick = btnMapClick
-    end
-    object btnExport: TToolButton
-      Left = 98
-      Top = 2
-      Caption = 'Export'
-      DropdownMenu = pmExport
-      Enabled = False
-      ImageIndex = 317
-      Style = tbsDropDown
-    end
-    object ToolButton1: TToolButton
-      Left = 93
-      Height = 45
-      Top = 2
-      Caption = 'ToolButton1'
-      Style = tbsDivider
-    end
+  end
+  object btnExport: TBitBtn
+    Left = 944
+    Height = 45
+    Top = 275
+    Width = 208
+    Caption = 'Export Data'
+    Enabled = False
+    Images = frmicons.IL1
+    ImageIndex = 317
+    OnClick = btnExportClick
+    TabOrder = 7
   end
   object OD: TOpenDialog
     Options = [ofHideReadOnly, ofEnableSizing, ofDontAddToRecent]
@@ -587,15 +565,12 @@ object frmosmain: Tfrmosmain
     top = 280
     object btnExportASCII: TMenuItem
       Caption = 'ASCII format'
-      OnClick = btnExportASCIIClick
     end
     object btnExportHDB: TMenuItem
       Caption = 'HDB format'
-      OnClick = btnExportHDBClick
     end
     object btnExportNetCDF: TMenuItem
       Caption = 'netCDF format'
-      OnClick = btnExportNetCDFClick
     end
   end
 end

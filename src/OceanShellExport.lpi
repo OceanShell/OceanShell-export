@@ -45,7 +45,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="18">
+    <Units Count="19">
       <Unit0>
         <Filename Value="OceanShellExport.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -118,29 +118,28 @@
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="osexport_comfort_table.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmExport_COMFORT_table"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit14>
-      <Unit15>
         <Filename Value="gibbsseawater.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="GibbsSeaWater"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="osexport.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmexport"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit15>
       <Unit16>
-        <Filename Value="osexport_hdb.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmexport_hdb"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit16>
-      <Unit17>
         <Filename Value="osexport_netcdf.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmexport_netcdf"/>
-        <ResourceBaseClass Value="Form"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="osexport_hdb.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="osexport_ascii.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit18>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

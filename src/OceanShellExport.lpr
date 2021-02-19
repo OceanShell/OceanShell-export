@@ -9,7 +9,7 @@ uses
     {$ENDIF}
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, osmain, dm, icons, GibbsSeaWater, osexport_hdb, osexport_netcdf;
+  Forms, osmain, dm, icons;
 
 {$R *.res}
 
