@@ -46,18 +46,6 @@ PQF1,PQF2,SQF,WQF :integer;
 btl_num,units_id,instr_id,prf_num,prf_best :integer;
 fo: text;
 begin
-  tbl_count:=0;
-{T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
-{TC}if frmexport.CheckGroup1.Checked[kt] then begin
-  tbl_count:=tbl_count+1;
-{TC}end;
-{T} end;
-if tbl_count=0 then begin
-   showmessage('Variable is not selected!');
-   Exit;
-end;
-
-
 try
  frmdm.Q.DisableControls;
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
@@ -185,11 +173,10 @@ try
 
      isconverted:=false;
      //ICES
-     getdefaultunits(tbl,units_id,units_def,val,val_conv1,isconverted);
+     GetDefaultUnits(tbl,units_id,units_def,val,val_conv1,isconverted);
 
     //Advanced
- //   if CheckBox2.Checked then
- //    GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv2,isconverted);
+     GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv2,isconverted);
 
    end;
 

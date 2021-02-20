@@ -487,6 +487,7 @@ object frmosmain: Tfrmosmain
       Height = 28
       Top = 136
       Width = 680
+      Enabled = False
       Font.Color = clWindowText
       Font.Height = -17
       Font.Name = 'MS Sans Serif'

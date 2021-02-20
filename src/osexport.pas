@@ -46,10 +46,21 @@ end;
 
 procedure Tfrmexport.btnExportClick(Sender: TObject);
 Var
+  tbl_count, kt: integer;
   DT1, DT2:TDateTime;
   user_path: string;
 begin
  memo1.Clear;
+
+   tbl_count:=0;
+   for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do
+     if frmexport.CheckGroup1.Checked[kt] then inc(tbl_count);
+
+   if tbl_count=0 then begin
+      showmessage('Variable is not selected!');
+      Exit;
+   end;
+
 
  if frmosmain.ODir.Execute then begin
   // export folder

@@ -215,6 +215,7 @@ begin
       Params.Add('WireCompression=true');
       Connected:=true;
     end;
+    caption:='Export ['+DBHost+': '+DBPath+']';
   except
     on e: Exception do
       if MessageDlg(e.message, mtError, [mbOk], 0)=mrOk then close;
@@ -353,6 +354,7 @@ try
 
     (* Date and Time *)
     // From date to date
+  //  if (dtpDateMin.DateTime<>MinDate) or (dtpDateMax.DateTime<>MaxDate) then begin
       if chkPeriod.Checked=false then begin
        SQL_str:=SQL_str+' AND (DATEANDTIME BETWEEN '+
                         QuotedStr(DateTimeToStr(dtpDateMin.DateTime))+' AND '+
@@ -384,6 +386,7 @@ try
                           ' (Extract(Day from DATEANDTIME)<= '+
                           IntToStr(SSDayMax)+')) ';
     end;
+  //  end; // dates are not default
 
     if trim(cbSource.Text)<>'' then begin
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
@@ -401,7 +404,7 @@ try
       SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
       ' CRUISE, PLATFORM, COUNTRY WHERE CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
       ' PLATFORM.COUNTRY_ID=COUNTRY.ID AND '+NotCondSource+
-      ' PLATFORM.NAME = '+QuotedStr(cbCountry.Text)+')) ';
+      ' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+')) ';
     end;
 
     if trim(cbCruise.Text)<>'' then begin
@@ -506,8 +509,10 @@ try
      SQL.Add('ORDER BY DATEANDTIME ');
 
      (* Show the query before executing *)
-  {  if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
-                  mtInformation, [mbYes, mbNo],0)=mrNo then exit;  }
+   { if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
+                  mtInformation, [mbYes, mbNo],0)=mrNo then exit; }
+
+   // memo1.lines.Add(SQL.Text);
     Open;
    end;
 
@@ -524,10 +529,7 @@ end;
 
 
 procedure Tfrmosmain.lbResetSearchStationsClick(Sender: TObject);
-Var
-  k:integer;
 begin
-
   pcRegion.ActivePageIndex:=0;
 
   cbPredefinedRegion.Items.Clear;
@@ -543,6 +545,8 @@ begin
   cbCruise.Clear;
   cbInstitute.Clear;
   cbProject.Clear;
+
+  cbCruise.Enabled:=false;
 
   chkNOTPlatform.Checked:=false;
   chkNOTCountry.Checked:=false;
@@ -739,9 +743,6 @@ Var
   pp, k: integer;
   SQL_str:string;
 begin
- cbCruise.Clear;
- if cbPlatform.Items.Count>0 then exit;
-
   try
    TRt:=TSQLTransaction.Create(self);
    TRt.DataBase:=frmdm.IBDB;
@@ -750,21 +751,46 @@ begin
    Qt.Database:=frmdm.IBDB;
    Qt.Transaction:=TRt;
 
-   if cbCountry.Text='' then begin
-     Qt.Close;
-     Qt.SQL.Text:=' SELECT DISTINCT NAME FROM PLATFORM ORDER BY NAME ';
-     Qt.Open;
-   end;
-
-   if cbCountry.Text<>'' then begin
+   if (cbSource.Text='') and (cbCountry.Text='') then begin
     With Qt do begin
      Close;
-       SQL.Add(' SELECT DISTINCT NAME FROM PLATFORM ');
-       SQL.Add(' WHERE COUNTRY_ID IN (SELECT ID FROM COUNTRY ');
-       SQL.Add(' WHERE COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+')');
-       SQL.Add(' ORDER BY NAME ');
-     //  showmessage(SQL.Text);
-     Qt.Open;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
+       SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID ');
+       SQL.Add(' ORDER BY PLATFORM.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbSource.Text<>'') and (cbCountry.Text='') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
+       SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID ');
+       SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID WHERE  ');
+       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' ORDER BY PLATFORM.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbSource.Text<>'') and (cbCountry.Text<>'') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
+       SQL.Add(' PLATFORM, CRUISE, SOURCE, COUNTRY WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID AND ');
+       SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCountry.Text)+' AND ');
+       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' ORDER BY PLATFORM.NAME ');
+     Open;
     end;
    end;
 
@@ -779,6 +805,8 @@ begin
    Qt.Free;
    TrT.Free;
   end;
+
+  if cbPlatform.Text='' then cbCruise.Enabled:=true;
 end;
 
 
@@ -789,8 +817,6 @@ Var
   pp, k: integer;
   SQL_str:string;
 begin
- if cbCruise.Items.Count>0 then exit;
-
   try
    TRt:=TSQLTransaction.Create(self);
    TRt.DataBase:=frmdm.IBDB;
@@ -799,25 +825,16 @@ begin
    Qt.Database:=frmdm.IBDB;
    Qt.Transaction:=TRt;
 
-
-   if cbPlatform.Text='' then begin
-     Qt.Close;
-     Qt.SQL.Text:=' SELECT DISTINCT CRUISE_NUMBER FROM CRUISE ORDER BY CRUISE_NUMBER ';
-     Qt.Open;
-   end;
-
-   if cbPlatform.Text<>'' then begin
     With Qt do begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT CRUISE_NUMBER FROM CRUISE ');
        SQL.Add(' WHERE PLATFORM_ID IN (SELECT ID FROM PLATFORM ');
-       SQL.Add(' WHERE PLATFORM.NAME = '+QuotedStr(cbPlatform.Text));
+       SQL.Add(' WHERE PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+')');
        SQL.Add(' ORDER BY CRUISE_NUMBER ');
      //  showmessage(SQL.Text);
      Qt.Open;
     end;
-   end;
 
    while not Qt.Eof do begin
      cbCruise.Items.Add(Qt.Fields[0].AsString);
@@ -839,8 +856,6 @@ Var
   TRt:TSQLTransaction;
   Qt:TSQLQuery;
 begin
-  cbPlatform.Clear;
-  if cbCountry.Items.Count>0 then exit;
 
   try
    TRt:=TSQLTransaction.Create(self);
@@ -851,12 +866,66 @@ begin
    Qt.Transaction:=TRt;
 
 
-//   DBCruiseCountry.Items.Clear;
    cbCountry.Clear;
+   if (cbSource.Text='') and (cbPLATFORM.Text='') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM COUNTRY ');
+       SQL.Add(' INNER JOIN PLATFORM ON ');
+       SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID ');
+       SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID ');
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
 
-   Qt.Close;
-   Qt.SQL.Text:=' SELECT DISTINCT NAME FROM COUNTRY ORDER BY NAME ';
-   Qt.Open;
+   if (cbSource.Text<>'') and (cbPlatform.Text='') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbSource.Text='') and (cbPlatform.Text<>'') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' PLATFORM.NAME='+QuotedStr(cbPlatform.Text));
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbSource.Text<>'') and (cbPlatform.Text<>'') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text)+' AND ');
+       SQL.Add(' PLATFORM.NAME='+QuotedStr(cbPlatform.Text));
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
 
    while not Qt.Eof do begin
      cbCountry.Items.Add(Qt.Fields[0].AsString);
@@ -880,8 +949,6 @@ Var
   Qt:TSQLQuery;
 begin
 
-  if cbSource.Items.Count>0 then exit;
-
   try
    TRt:=TSQLTransaction.Create(self);
    TRt.DataBase:=frmdm.IBDB;
@@ -892,9 +959,64 @@ begin
 
    cbSource.Clear;
 
-   Qt.Close;
-   Qt.SQL.Text:=' SELECT DISTINCT NAME FROM SOURCE ORDER BY NAME ';
-   Qt.Open;
+   if (cbCountry.Text='') and (cbPLATFORM.Text='') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT SOURCE.NAME FROM SOURCE ');
+       SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID ');
+       SQL.Add(' ORDER BY SOURCE.NAME ');
+     Open;
+    end;
+   end;
+
+
+   if (cbCountry.Text<>'') and (cbPlatform.Text='') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT SOURCE.NAME FROM ');
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCOuntry.Text));
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbCountry.Text='') and (cbPlatform.Text<>'') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT SOURCE.NAME FROM ');
+       SQL.Add(' PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' PLATFORM.NAME='+QuotedStr(cbCOuntry.Text));
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbCountry.Text<>'') and (cbPlatform.Text<>'') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT SOURCE.NAME FROM ');
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCountry.Text)+' AND ');
+       SQL.Add(' PLATFORM.NAME='+QuotedStr(cbPlatform.Text));
+       SQL.Add(' ORDER BY COUNTRY.NAME ');
+     Open;
+    end;
+   end;
+
 
       while not Qt.Eof do begin
         cbSource.Items.Add(Qt.Fields[0].AsString);
@@ -907,11 +1029,6 @@ begin
    Qt.Free;
    TrT.Free;
   end;
-
- {  cbCruiseSource.Clear;
-   for pp:=0 to cbSource.Count-1 do
-     cbCruiseSource.AddItem(cbSource.Items.Strings[pp], cbUnchecked, true);
-     }
 end;
 
 procedure Tfrmosmain.cbInstituteDropDown(Sender: TObject);
@@ -1007,12 +1124,9 @@ if NavigationOrder=false then exit;
  If NavigationOrder=true then begin
   NavigationOrder:=false; //blocking everthing until previous operations have been completed
 
-  if not frmdm.QCruise.IsEmpty then
-    frmdm.QCruise.Locate('ID', frmdm.Q.FieldByName('CRUISE_ID').AsInteger,[]);
+  if frmmap_open=true then frmmap.ChangeID(ID); //Map
 
-     if frmmap_open=true then frmmap.ChangeID(ID); //Map
-
-     NavigationOrder:=true; //Завершили, открываем доступ к навигации
+  NavigationOrder:=true; //Завершили, открываем доступ к навигации
  end;
 end;
 

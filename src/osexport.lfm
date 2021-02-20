@@ -47,8 +47,8 @@ object frmexport: Tfrmexport
     ClientWidth = 202
     ItemIndex = 0
     Items.Strings = (
-      'ASCII'
-      'HDB'
+      'Text (variables)'
+      'Text (stations)'
       'netCDF'
     )
     TabOrder = 1
