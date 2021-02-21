@@ -57,6 +57,38 @@ try
    tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
   // memo1.Lines.Add(tbl);
 
+      with frmdm.q1 do begin
+       Close;
+        SQL.Clear;
+        SQL.Add(' SELECT ID FROM '+tbl);
+        SQL.Add(' ROWS 1 ');
+       Open;
+      end;
+
+   if not frmdm.q1.IsEmpty then begin
+   fn:=user_path+copy(tbl,3,length(tbl))+'.txt';
+   assignfile(fo,fn);
+   rewrite(fo);
+
+  // if convert=true then
+   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'
+   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
+   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'
+   +#9+'units_def'+#9+'val_conv1'+#9+'val_conv2';
+ {  if convert=false then
+   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'
+   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
+   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'; }
+
+   {...four tables include additional column}
+   if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
+   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'+#9+'count_err'
+   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
+   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best';
+
+   writeln(fo,fstr);
+
+
    {...default unit values to be converted}
    with frmdm.q2 do begin
      Close;
@@ -80,32 +112,6 @@ try
      Close;
    end;
 
-   //memo1.Lines.Add('default units: '+inttostr(units_def)+' ('+units_name+')');
-
-//   if mik=1 then convert:=false else convert:=true;
-//   if convert=false then memo1.Lines.Add('Units conversion is not required');
-
-   fn:=user_path+copy(tbl,3,length(tbl))+'.txt';
-   assignfile(fo,fn);
-   rewrite(fo);
-
-  // if convert=true then
-   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'
-   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
-   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'
-   +#9+'units_def'+#9+'val_conv1'+#9+'val_conv2';
- {  if convert=false then
-   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'
-   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
-   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'; }
-
-   {...four tables include additional column}
-   if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
-   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'+#9+'count_err'
-   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
-   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best';
-
-   writeln(fo,fstr);
 
    {.....total number samples in table}
   frmdm.Q.First;
@@ -114,6 +120,7 @@ try
      ID :=frmdm.Q.FieldByName('ID').Value;
      Lat:=frmdm.Q.FieldByName('LATITUDE').Value;
      Lon:=frmdm.Q.FieldByName('LONGITUDE').Value;
+
 
   //   showmessage(inttostr(iD));
 
@@ -236,12 +243,14 @@ try
 {S}end;
 
 
+
   frmdm.Q.Next;
 {STEP}end;
-
-
   closefile(fo);
 {C}end; {table is checked }
+
+ end; //if q1 is not empty
+
 {T}end; {tables cycle}
 finally
   frmdm.Q.EnableControls;

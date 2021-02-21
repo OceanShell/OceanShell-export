@@ -77,6 +77,7 @@ type
 
     procedure btnExportClick(Sender: TObject);
     procedure cbCruiseDropDown(Sender: TObject);
+    procedure cbPlatformSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure lbResetSearchStationsClick(Sender: TObject);
@@ -309,7 +310,7 @@ NotCondInstitute, NotCondProject, NotCondOrigin, SBordersFile:string;
 
 dlat, dlon, lat, lon, dist:real;
 time0, time1:TDateTime;
-buf_str, SQL_str, QCFlag_str: string;
+buf_str, SQL_str, QCFlag_str, cr: string;
 LatMin, LatMax, LonMin, LonMax:real;
 begin
 
@@ -408,9 +409,11 @@ try
     end;
 
     if trim(cbCruise.Text)<>'' then begin
+     if Pos('_', cbCruise.Text)>0 then
+        cr:=copy(cbCruise.Text, 1, Pos('_', cbCruise.Text)-1) else
+        cr:=cbCruise.Text;
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-     ' CRUISE WHERE '+NotCondSource+' CRUISE.CRUISE_NUMBER = '+
-     QuotedStr(cbCruise.Text)+')) ';
+     ' CRUISE WHERE '+NotCondSource+' CRUISE.ID = '+cr+')) ';
     end;
 
     if trim(cbInstitute.Text)<>'' then begin
@@ -751,6 +754,7 @@ begin
    Qt.Database:=frmdm.IBDB;
    Qt.Transaction:=TRt;
 
+   cbPlatform.Clear;
    if (cbSource.Text='') and (cbCountry.Text='') then begin
     With Qt do begin
      Close;
@@ -773,6 +777,21 @@ begin
        SQL.Add(' RIGHT JOIN CRUISE ON ');
        SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID WHERE  ');
        SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' ORDER BY PLATFORM.NAME ');
+     Open;
+    end;
+   end;
+
+   if (cbSource.Text='') and (cbCountry.Text<>'') then begin
+    With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
+       SQL.Add(' PLATFORM, CRUISE, SOURCE, COUNTRY WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+       SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID AND ');
+       SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCountry.Text));
        SQL.Add(' ORDER BY PLATFORM.NAME ');
      Open;
     end;
@@ -805,8 +824,6 @@ begin
    Qt.Free;
    TrT.Free;
   end;
-
-  if cbPlatform.Text='' then cbCruise.Enabled:=true;
 end;
 
 
@@ -814,8 +831,8 @@ procedure Tfrmosmain.cbCruiseDropDown(Sender: TObject);
 Var
   TRt:TSQLTransaction;
   Qt:TSQLQuery;
-  pp, k: integer;
-  SQL_str:string;
+  pp, k, cr_id: integer;
+  SQL_str, cr, cr_num:string;
 begin
   try
    TRt:=TSQLTransaction.Create(self);
@@ -828,7 +845,7 @@ begin
     With Qt do begin
      Close;
        SQL.Clear;
-       SQL.Add(' SELECT DISTINCT CRUISE_NUMBER FROM CRUISE ');
+       SQL.Add(' SELECT DISTINCT ID, CRUISE_NUMBER FROM CRUISE ');
        SQL.Add(' WHERE PLATFORM_ID IN (SELECT ID FROM PLATFORM ');
        SQL.Add(' WHERE PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+')');
        SQL.Add(' ORDER BY CRUISE_NUMBER ');
@@ -837,7 +854,12 @@ begin
     end;
 
    while not Qt.Eof do begin
-     cbCruise.Items.Add(Qt.Fields[0].AsString);
+     cr_id:=Qt.Fields[0].Value;
+     cr_num:=Qt.Fields[1].AsString;
+     if trim(cr_num)<>'' then
+        cr:=inttostr(cr_id)+'_'+cr_num else
+        cr:=inttostr(cr_id);
+     cbCruise.Items.Add(cr);
     Qt.Next;
    end;
 
@@ -847,6 +869,11 @@ begin
    Qt.Free;
    TrT.Free;
   end;
+end;
+
+procedure Tfrmosmain.cbPlatformSelect(Sender: TObject);
+begin
+  if cbPlatform.Text<>'' then cbCruise.Enabled:=true;
 end;
 
 
@@ -982,7 +1009,7 @@ begin
        SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
        SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
        SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCOuntry.Text));
-       SQL.Add(' ORDER BY COUNTRY.NAME ');
+       SQL.Add(' ORDER BY SOURCE.NAME ');
      Open;
     end;
    end;
@@ -996,7 +1023,7 @@ begin
        SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
        SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
        SQL.Add(' PLATFORM.NAME='+QuotedStr(cbCOuntry.Text));
-       SQL.Add(' ORDER BY COUNTRY.NAME ');
+       SQL.Add(' ORDER BY SOURCE.NAME ');
      Open;
     end;
    end;
@@ -1012,7 +1039,7 @@ begin
        SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
        SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCountry.Text)+' AND ');
        SQL.Add(' PLATFORM.NAME='+QuotedStr(cbPlatform.Text));
-       SQL.Add(' ORDER BY COUNTRY.NAME ');
+       SQL.Add(' ORDER BY SOURCE.NAME ');
      Open;
     end;
    end;
