@@ -36,7 +36,7 @@ units_def,station_id :integer;
 step,row1,row2,sel_size :integer;
 conv1_min,conv1_max,conv2_min,conv2_max :real;
 conv1_md,conv2_md :double;
-tbl,fn,units_name,fstr :string;
+tbl,fn,units_name,fstr,st :string;
 convert,isconverted,best :boolean;
 DT1,DT2: TDateTime;
 
@@ -57,15 +57,6 @@ try
    tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
   // memo1.Lines.Add(tbl);
 
-      with frmdm.q1 do begin
-       Close;
-        SQL.Clear;
-        SQL.Add(' SELECT ID FROM '+tbl);
-        SQL.Add(' ROWS 1 ');
-       Open;
-      end;
-
-   if not frmdm.q1.IsEmpty then begin
    fn:=user_path+copy(tbl,3,length(tbl))+'.txt';
    assignfile(fo,fn);
    rewrite(fo);
@@ -120,9 +111,6 @@ try
      ID :=frmdm.Q.FieldByName('ID').Value;
      Lat:=frmdm.Q.FieldByName('LATITUDE').Value;
      Lon:=frmdm.Q.FieldByName('LONGITUDE').Value;
-
-
-  //   showmessage(inttostr(iD));
 
        samples_count:=0;
        conv1_count:=0;
@@ -247,9 +235,15 @@ try
   frmdm.Q.Next;
 {STEP}end;
   closefile(fo);
+
+  assignfile(fo, fn); reset(fo);
+  readln(fo, st);
+  readln(fo, st);
+  closefile(fo);
+  if trim(st)='' then DeleteFile(fn);
+
 {C}end; {table is checked }
 
- end; //if q1 is not empty
 
 {T}end; {tables cycle}
 finally
