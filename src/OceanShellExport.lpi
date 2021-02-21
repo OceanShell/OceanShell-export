@@ -126,6 +126,7 @@
         <Filename Value="osexport.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmexport"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit15>
       <Unit16>

@@ -445,6 +445,9 @@ object frmosmain: Tfrmosmain
       Height = 28
       Top = 17
       Width = 680
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      DropDownCount = 10
       Font.Color = clWindowText
       Font.Height = -17
       Font.Name = 'MS Sans Serif'

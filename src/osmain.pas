@@ -771,11 +771,10 @@ begin
     With Qt do begin
      Close;
        SQL.Clear;
-       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
-       SQL.Add(' RIGHT JOIN CRUISE ON ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID ');
-       SQL.Add(' RIGHT JOIN CRUISE ON ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID WHERE  ');
+       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM ');
+       SQL.Add(' PLATFORM, CRUISE, SOURCE WHERE ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
        SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
        SQL.Add(' ORDER BY PLATFORM.NAME ');
      Open;
@@ -848,11 +847,13 @@ begin
        SQL.Add(' SELECT DISTINCT ID, CRUISE_NUMBER FROM CRUISE ');
        SQL.Add(' WHERE PLATFORM_ID IN (SELECT ID FROM PLATFORM ');
        SQL.Add(' WHERE PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+')');
+       SQL.Add(' AND CRUISE.STATIONS_DATABASE>0 ');
        SQL.Add(' ORDER BY CRUISE_NUMBER ');
      //  showmessage(SQL.Text);
      Qt.Open;
     end;
 
+    cbCruise.Clear;
    while not Qt.Eof do begin
      cr_id:=Qt.Fields[0].Value;
      cr_num:=Qt.Fields[1].AsString;
@@ -1064,9 +1065,6 @@ Var
   TRt:TSQLTransaction;
   Qt:TSQLQuery;
 begin
-
-  if cbInstitute.Items.Count>0 then exit;
-
   try
    TRt:=TSQLTransaction.Create(self);
    TRt.DataBase:=frmdm.IBDB;
@@ -1078,9 +1076,15 @@ begin
    //DBCruiseInstitute.Items.Clear;
    cbInstitute.Clear;
 
-   Qt.Close;
-   Qt.SQL.Text:=' SELECT DISTINCT NAME FROM INSTITUTE ORDER BY NAME ';
-   Qt.Open;
+     With Qt do begin
+       Close;
+         SQL.Clear;
+         SQL.Add(' SELECT DISTINCT NAME FROM INSTITUTE ');
+         SQL.Add(' RIGHT JOIN CRUISE ON ');
+         SQL.Add(' CRUISE.INSTITUTE_ID=INSTITUTE.ID ');
+         SQL.Add(' ORDER BY NAME ');
+       Open;
+      end;
 
       while not Qt.Eof do begin
         cbInstitute.Items.Add(Qt.Fields[0].AsString);
@@ -1095,11 +1099,6 @@ begin
    Qt.Free;
    TrT.Free;
   end;
-
- {  cbCruiseInstitute.Clear;
-   for pp:=0 to cbInstitute.Count-1 do
-     cbCruiseInstitute.AddItem(cbInstitute.Items.Strings[pp], cbUnchecked, true);
-}
 end;
 
 procedure Tfrmosmain.cbProjectDropDown(Sender: TObject);
@@ -1108,8 +1107,6 @@ Var
   TRt:TSQLTransaction;
   Qt:TSQLQuery;
 begin
-
-if cbProject.Items.Count>0 then exit;
 
  try
    TRt:=TSQLTransaction.Create(self);
@@ -1122,9 +1119,15 @@ if cbProject.Items.Count>0 then exit;
    //DBCruiseProject.Items.Clear;
    cbProject.Clear;
 
-   Qt.Close;
-   Qt.SQL.Text:=' SELECT DISTINCT NAME FROM PROJECT ORDER BY NAME ';
-   Qt.Open;
+   With Qt do begin
+     Close;
+       SQL.Clear;
+       SQL.Add(' SELECT DISTINCT NAME FROM PROJECT ');
+       SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.PROJECT_ID=PROJECT.ID ');
+       SQL.Add(' ORDER BY NAME ');
+     Open;
+    end;
 
       while not Qt.Eof do begin
         cbProject.Items.Add(Qt.Fields[0].AsString);
