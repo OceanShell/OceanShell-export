@@ -163,7 +163,7 @@ begin
     Close;
      SQL.Clear;
      SQL.Add(' SELECT P_TEMPERATURE.VAL AS TVAL, ');
-     SQL.Add(' SELECT P_TEMPERATURE.LEV_DBAR AS TLEV, ');
+     SQL.Add(' P_TEMPERATURE.LEV_DBAR AS TLEV, ');
      SQL.Add(' P_SALINITY.VAL AS SVAL ');
      SQL.Add(' FROM P_TEMPERATURE, P_SALINITY ');
      SQL.Add(' WHERE ');

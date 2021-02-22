@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Dialogs, Variants,
 
   // program modules
-  osmain, dm, osexport, osunitsconversion;
+  osmain, dm, osexport, osunitsconversion, procedures;
 
 
 procedure ExportASCII(user_path:string);
@@ -65,9 +65,6 @@ try
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
 
-  // Edit1.Text:='';
-  // Edit2.Text:='';
-
    tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
 
    {...default unit values to be converted}
@@ -78,7 +75,7 @@ try
      SQL.Add(' where name_table=:nt ');
      ParamByName('nt').AsString:=tbl;
      Open;
-     units_def:=FieldByName('units_id_default').AsInteger;
+       units_def:=FieldByName('units_id_default').AsInteger;
      Close;
    end;
 
@@ -89,7 +86,7 @@ try
      SQL.Add(' where id=:units_id ');
      ParamByName('units_id').AsInteger:=units_def;
      Open;
-     units_name:=FieldByName('ns').AsString;
+       units_name:=FieldByName('ns').AsString;
      Close;
    end;
 
@@ -131,8 +128,8 @@ try
      QCF  :=frmdm.Q.FieldByName('QCFLAG').Value;
      Ver  :=frmdm.Q.FieldByName('STVERSION').Value;
 
-     if first_tbl then begin
-       with frmdm.q1 do begin
+     if first_tbl=true then begin
+       with frmdm.q3 do begin
         Close;
          SQL.Clear;
          SQL.Add(' SELECT ');
@@ -166,7 +163,7 @@ try
       if VarIsNull(CrNum)=true then CrNum:='';
       if VarIsNull(StNum)=true then StNum:='';
       if VarIsNull(PiName)=true then PiName:='';
-      if VarIsNull(Depth)=true then Depth:=99999;
+      if VarIsNull(Depth)=true then Depth:=-9999;
 
         writeln(md,inttostr(ID), #9,
                    floattostr(Lat), #9,
@@ -200,33 +197,43 @@ try
        conv2_max:=-9999;
        conv2_md:=0;
 
+ //  frmexport.memo1.lines.Add(tbl+'   '+inttostr(id));
+
    with frmdm.q1 do begin
      Close;
      SQL.Clear;
-     SQL.Add(' select * from '+tbl);
-     SQL.Add(' where ID=:ID');
-     ParamByName('ID').AsInteger:=ID;
+     SQL.Add(' SELECT * FROM '+tbl);
+     SQL.Add(' WHERE ID=:ID ');
+     ParamByName('ID').Value:=ID;
+     //showmessage(sql.text);
      Open;
    end;
 
+  // showmessage('here');
    while not frmdm.q1.EOF do begin
 
    WQF:=9;
    val_conv1:=-9999;
    val_conv2:=-9999;
 
-   station_id:=frmdm.q1.FieldByName('id').AsInteger;
-   lev_dbar:=frmdm.q1.FieldByName('lev_dbar').AsFloat;
-   lev_m:=frmdm.q1.FieldByName('lev_m').AsFloat;
-   val:=frmdm.q1.FieldByName('val').AsFloat;
-   PQF1:=frmdm.q1.FieldByName('PQF1').AsInteger;
-   PQF2:=frmdm.q1.FieldByName('PQF2').AsInteger;
-   SQF:=frmdm.q1.FieldByName('SQF').AsInteger;
-   btl_num:=frmdm.q1.FieldByName('bottle_number').AsInteger;
-   units_id:=frmdm.q1.FieldByName('units_id').AsInteger;
-   instr_id:=frmdm.q1.FieldByName('instrument_id').AsInteger;
-   prf_num:=frmdm.q1.FieldByName('profile_number').AsInteger;
-   best:=frmdm.q1.FieldByName('profile_best').AsBoolean;
+ //  showmessage('here1');
+
+   station_id:=frmdm.q1.FieldByName('id').Value;
+   lev_dbar:=frmdm.q1.FieldByName('lev_dbar').Value;
+   lev_m:=frmdm.q1.FieldByName('lev_m').Value;
+   val:=frmdm.q1.FieldByName('val').Value;
+   PQF1:=frmdm.q1.FieldByName('PQF1').Value;
+   PQF2:=frmdm.q1.FieldByName('PQF2').Value;
+   SQF:=frmdm.q1.FieldByName('SQF').Value;
+   units_id:=frmdm.q1.FieldByName('units_id').Value;
+   instr_id:=frmdm.q1.FieldByName('instrument_id').Value;
+   prf_num:=frmdm.q1.FieldByName('profile_number').Value;
+   best:=frmdm.q1.FieldByName('profile_best').Value;
+
+  //// showmessage('here2');
+
+   if not VarIsNull(frmdm.q1.FieldByName('bottle_number').Value) then
+     btl_num:=frmdm.q1.FieldByName('bottle_number').Value else btl_num:=-9;
 
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
    valerr:=frmdm.q1.FieldByName('valerr').AsFloat;
@@ -241,6 +248,8 @@ try
      val_conv2:=val;
    end;
 
+  // showmessage('here3');
+
    {CONVERSION}
    if units_id<>units_def then begin
 
@@ -252,6 +261,8 @@ try
      GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv2,isconverted);
 
    end;
+
+  // showmessage('here4');
 
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
    writeln(fo,inttostr(station_id)
@@ -320,15 +331,18 @@ try
   closefile(fo);
   if trim(st)='' then DeleteFile(fn);
 
-  first_tbl:=false;
-
+   first_tbl:=false;
+  // exit;
 {C}end; {table is checked }
+
+   ProgressTaskbar(kt, frmexport.CheckGroup1.Items.Count-1);
 
 
 {T}end; {tables cycle}
 finally
   closefile(md);
   frmdm.Q.EnableControls;
+  ProgressTaskbar(0, 0);
 end;
 
 end;

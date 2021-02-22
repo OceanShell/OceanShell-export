@@ -18,6 +18,7 @@ type
     btnSelectAll: TLabel;
     Memo1: TMemo;
     RadioGroup1: TRadioGroup;
+    grConversion: TRadioGroup;
     procedure btnExportClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnSelectAllClick(Sender: TObject);
@@ -72,7 +73,7 @@ begin
 
   case RadioGroup1.ItemIndex of
    0: osexport_ascii.ExportASCII(user_path);
-   1: osexport_hdb.ExportHDB(user_path);
+   1: osexport_hdb.ExportHDB(user_path, grConversion.ItemIndex); //0-ices, 1-precise
    2: osexport_netcdf.ExportNetCDF(user_path);
   end;
 

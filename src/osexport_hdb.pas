@@ -10,11 +10,11 @@ uses
   // program modules
   osmain, dm, osexport, osunitsconversion, procedures;
 
-procedure ExportHDB(user_path:string);
+procedure ExportHDB(user_path:string; conv:integer);
 
 implementation
 
-procedure ExportHDB(user_path:string);
+procedure ExportHDB(user_path:string; conv:integer);
 Var
   ID, k, kt, cnt, units_def:integer;
   tbl, units_name: string;

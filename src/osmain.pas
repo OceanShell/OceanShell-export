@@ -105,10 +105,13 @@ type
 const
   StationSQL =
     'SELECT '+
-    'ID, LATITUDE, LONGITUDE, DATEANDTIME, BOTTOMDEPTH, LASTLEVEL_M, '+
+    'STATION.ID, LATITUDE, LONGITUDE, DATEANDTIME, BOTTOMDEPTH, LASTLEVEL_M, '+
     'LASTLEVEL_DBAR, CRUISE_ID, CAST_NUMBER, ST_NUMBER_ORIGIN, '+
     'QCFLAG, BOTTOMDEPTH_GEBCO, STVERSION  '+
-    'FROM STATION ';
+    'FROM STATION, CRUISE, PLATFORM, COUNTRY, INSTITUTE, PROJECT WHERE '+
+    'STATION.CRUISE_ID=CRUISE.ID AND CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
+    'PLATFORM.COUNTRY_ID=COUNTRY.ID AND CRUISE.INSTITUTE_ID=INSTITUTE.ID AND '+
+    'CRUISE.PROJECT_ID=PROJECT.ID ';
 
 var
   frmosmain: Tfrmosmain;
@@ -390,6 +393,20 @@ try
     end;
   //  end; // dates are not default
 
+    if trim(cbCruise.Text)<>'' then begin
+     if Pos('_', cbCruise.Text)>0 then
+        cr:=copy(cbCruise.Text, 1, Pos('_', cbCruise.Text)-1) else
+        cr:=cbCruise.Text;
+     SQL_str:=SQL_str+' AND ('+NotCondCruise+' CRUISE.ID = '+cr+') ';
+    end else
+      if trim(cbPlatform.Text)<>'' then
+        SQL_str:=SQL_str+' AND ('+NotCondPlatform+' PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ' else
+        if trim(cbCountry.Text)<>'' then
+          SQL_str:=SQL_str+' AND ('+NotCondCountry+' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ' else
+            if trim(cbSource.Text)<>'' then
+              SQL_str:=SQL_str+' AND ('+NotCondSource+' SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ';
+
+  {
     if trim(cbSource.Text)<>'' then begin
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
           ' CRUISE, SOURCE WHERE CRUISE.SOURCE_ID=SOURCE.ID AND '+
@@ -428,10 +445,11 @@ try
      ' CRUISE, PROJECT WHERE CRUISE.PROJECT_ID=PROJECT.ID AND '+
      NotCondSource+' PROJECT.NAME = '+QuotedStr(cbProject.Text)+')) ';
     end;
+    }
 
     SQL_str:=SQL_str+' AND (STATION.DUPLICATE=FALSE) ';
 
-    if copy(SQL_str, 1, 4)=' AND'   then SQL_str:=Copy(SQL_str, 5, length(SQL_str));
+  //  if copy(SQL_str, 1, 4)=' AND'   then SQL_str:=Copy(SQL_str, 5, length(SQL_str));
 
 
     // predefined region
@@ -507,14 +525,14 @@ try
      SQL.Clear;
      SQL.Add(StationSQL);
      if trim(SQL_str)<>'' then begin
-      SQL.Add(' WHERE ');
+     // SQL.Add(' WHERE ');
       SQL.Add(SQL_str);
      end;
      SQL.Add('ORDER BY DATEANDTIME ');
 
      (* Show the query before executing *)
-   { if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
-                  mtInformation, [mbYes, mbNo],0)=mrNo then exit; }
+ {   if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
+                  mtInformation, [mbYes, mbNo],0)=mrNo then exit;  }
 
    // memo1.lines.Add(SQL.Text);
     Open;
