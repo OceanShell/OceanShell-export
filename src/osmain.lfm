@@ -1,7 +1,7 @@
 object frmosmain: Tfrmosmain
-  Left = 294
+  Left = 280
   Height = 758
-  Top = 135
+  Top = 189
   Width = 1380
   Caption = 'COMFORT Export'
   ClientHeight = 758
@@ -462,6 +462,8 @@ object frmosmain: Tfrmosmain
       Height = 28
       Top = 57
       Width = 680
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
       Font.Height = -17
       Font.Name = 'MS Sans Serif'
@@ -476,6 +478,8 @@ object frmosmain: Tfrmosmain
       Height = 28
       Top = 97
       Width = 680
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
       Font.Height = -17
       Font.Name = 'MS Sans Serif'
@@ -491,6 +495,8 @@ object frmosmain: Tfrmosmain
       Height = 28
       Top = 136
       Width = 680
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Enabled = False
       Font.Color = clWindowText
       Font.Height = -17
@@ -506,6 +512,8 @@ object frmosmain: Tfrmosmain
       Height = 28
       Top = 176
       Width = 680
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
       Font.Height = -17
       Font.Name = 'MS Sans Serif'
@@ -518,8 +526,10 @@ object frmosmain: Tfrmosmain
     object cbProject: TComboBox
       Left = 184
       Height = 28
-      Top = 214
+      Top = 213
       Width = 680
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
       Font.Height = -17
       Font.Name = 'MS Sans Serif'

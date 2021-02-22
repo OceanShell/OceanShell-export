@@ -7,7 +7,8 @@ interface
 uses
   SysUtils, Variants, Classes, Graphics, Controls, Forms, ComCtrls, LCLType,
   Menus, Dialogs, ActnList, StdCtrls, IniFiles, ExtCtrls, DateUtils, sqldb, DB,
-  Buttons, DBGrids, Spin, DBCtrls, DateTimePicker, dynlibs, LCLIntf, ComboEx;
+  Buttons, DBGrids, Spin, DBCtrls, DateTimePicker, dynlibs, LCLIntf, ComboEx,
+  FileCtrl;
 
 type
    MapDS=record
@@ -35,9 +36,9 @@ type
     btnExport: TBitBtn;
     btnMap: TBitBtn;
     btnSelect: TBitBtn;
-    cbProject: TComboBox;
     cbInstitute: TComboBox;
     cbCruise: TComboBox;
+    cbProject: TComboBox;
     cbPlatform: TComboBox;
     cbPredefinedRegion: TComboBox;
     cbCountry: TComboBox;
@@ -77,6 +78,7 @@ type
 
     procedure btnExportClick(Sender: TObject);
     procedure cbCruiseDropDown(Sender: TObject);
+    procedure cbProjectDropDown(Sender: TObject);
     procedure cbPlatformSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -87,7 +89,6 @@ type
     procedure cbInstituteDropDown(Sender: TObject);
     procedure cbPlatformDropDown(Sender: TObject);
     procedure cbPredefinedRegionDropDown(Sender: TObject);
-    procedure cbProjectDropDown(Sender: TObject);
     procedure cbSourceDropDown(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -823,6 +824,8 @@ begin
    Qt.Free;
    TrT.Free;
   end;
+
+  cbCruise.Clear;
 end;
 
 
@@ -848,6 +851,7 @@ begin
        SQL.Add(' WHERE PLATFORM_ID IN (SELECT ID FROM PLATFORM ');
        SQL.Add(' WHERE PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+')');
        SQL.Add(' AND CRUISE.STATIONS_DATABASE>0 ');
+       SQL.Add(' AND DUPLICATE = FALSE ');
        SQL.Add(' ORDER BY CRUISE_NUMBER ');
      //  showmessage(SQL.Text);
      Qt.Open;

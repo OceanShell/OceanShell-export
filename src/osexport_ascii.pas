@@ -5,7 +5,7 @@ unit osexport_ascii;
 interface
 
 uses
-  Classes, SysUtils, Dialogs,
+  Classes, SysUtils, Dialogs, Variants,
 
   // program modules
   osmain, dm, osexport, osunitsconversion;
@@ -44,8 +44,22 @@ DT1,DT2: TDateTime;
 lev_dbar,lev_m,val,valerr,val_conv1,val_conv2 :real;
 PQF1,PQF2,SQF,WQF :integer;
 btl_num,units_id,instr_id,prf_num,prf_best :integer;
-fo: text;
+fo, md: text;
+
+first_tbl:boolean=true;
+date1: TDateTime;
+CrID, Cast, QCF, Ver, SrcID, InstID, ProjID, PlatID:integer;
+Src, Inst, Proj, Ctry,  PLat: string;
+StNum, CrNum, PiName, Depth:Variant;
+
 begin
+
+ assignfile(md, user_path+'metadata.txt'); rewrite(md);
+ writeln(md,'Station_ID', #9, 'Latitude', #9, 'Longitude', #9, 'Date_and_time', #9,
+            'Bottom_depth', #9, 'St_number_origin', #9, 'St_version', #9,
+            'Cast_number', #9, 'Source_ID', #9, 'Source', #9, 'Cruise_ID', #9,
+            'Cruise_number', #9, 'Platform_ID', #9, 'Platform', #9, 'Country', #9,
+            'PI', #9,'Institute_ID', #9, 'Institute', #9, 'Project_ID', #9, 'Project');
 try
  frmdm.Q.DisableControls;
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
@@ -55,7 +69,29 @@ try
   // Edit2.Text:='';
 
    tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
-  // memo1.Lines.Add(tbl);
+
+   {...default unit values to be converted}
+   with frmdm.q1 do begin
+     Close;
+     SQL.Clear;
+     SQL.Add(' select units_id_default from DATABASE_TABLES ');
+     SQL.Add(' where name_table=:nt ');
+     ParamByName('nt').AsString:=tbl;
+     Open;
+     units_def:=FieldByName('units_id_default').AsInteger;
+     Close;
+   end;
+
+   with frmdm.q1 do begin
+     Close;
+     SQL.Clear;
+     SQL.Add(' select name_short as ns from UNITS ');
+     SQL.Add(' where id=:units_id ');
+     ParamByName('units_id').AsInteger:=units_def;
+     Open;
+     units_name:=FieldByName('ns').AsString;
+     Close;
+   end;
 
    fn:=user_path+copy(tbl,3,length(tbl))+'.txt';
    assignfile(fo,fn);
@@ -80,37 +116,79 @@ try
    writeln(fo,fstr);
 
 
-   {...default unit values to be converted}
-   with frmdm.q2 do begin
-     Close;
-     SQL.Clear;
-     SQL.Add(' select units_id_default from DATABASE_TABLES ');
-     SQL.Add(' where name_table=:nt ');
-     ParamByName('nt').AsString:=tbl;
-     Open;
-     units_def:=FieldByName('units_id_default').AsInteger;
-     Close;
-   end;
-
-   with frmdm.q3 do begin
-     Close;
-     SQL.Clear;
-     SQL.Add(' select name_short as ns from UNITS ');
-     SQL.Add(' where id=:units_id ');
-     ParamByName('units_id').AsInteger:=units_def;
-     Open;
-     units_name:=frmdm.q3.FieldByName('ns').AsString;
-     Close;
-   end;
-
-
    {.....total number samples in table}
   frmdm.Q.First;
   cnt:=frmdm.Q.RecordCount;
    while not frmdm.Q.EOF do begin
-     ID :=frmdm.Q.FieldByName('ID').Value;
-     Lat:=frmdm.Q.FieldByName('LATITUDE').Value;
-     Lon:=frmdm.Q.FieldByName('LONGITUDE').Value;
+     ID   :=frmdm.Q.FieldByName('ID').Value;
+     Lat  :=frmdm.Q.FieldByName('LATITUDE').Value;
+     Lon  :=frmdm.Q.FieldByName('LONGITUDE').Value;
+     Date1:=frmdm.Q.FieldByName('DATEANDTIME').Value;
+     Depth:=frmdm.Q.FieldByName('BOTTOMDEPTH').Value;
+     CrID :=frmdm.Q.FieldByName('CRUISE_ID').Value;
+     Cast :=frmdm.Q.FieldByName('CAST_NUMBER').Value;
+     StNum:=frmdm.Q.FieldByName('ST_NUMBER_ORIGIN').Value;
+     QCF  :=frmdm.Q.FieldByName('QCFLAG').Value;
+     Ver  :=frmdm.Q.FieldByName('STVERSION').Value;
+
+     if first_tbl then begin
+       with frmdm.q1 do begin
+        Close;
+         SQL.Clear;
+         SQL.Add(' SELECT ');
+         SQL.Add(' INSTITUTE_ID, PROJECT_ID, SOURCE_ID, SOURCE.NAME AS SRC, ');
+         SQL.Add(' COUNTRY.NAME AS COUNTRY, ');
+         SQL.Add(' INSTITUTE.NAME AS INSTITUTE, PROJECT.NAME AS PROJECT, ');
+         SQL.Add(' CRUISE.PI,  CRUISE_NUMBER, ');
+         SQL.Add(' PLATFORM_ID, PLATFORM.NAME AS PLATFORM ');
+         SQL.Add(' FROM CRUISE, PLATFORM, COUNTRY, INSTITUTE, PROJECT, SOURCE ');
+         SQL.Add(' WHERE ');
+         SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
+         SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+         SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID AND ');
+         SQL.Add(' CRUISE.INSTITUTE_ID=INSTITUTE.ID AND ');
+         SQL.Add(' CRUISE.PROJECT_ID=PROJECT.ID AND ');
+         SQL.Add(' CRUISE.ID='+inttostr(CrID));
+        Open;
+         CrNum :=FieldByName('CRUISE_NUMBER').Value;
+         SrcID :=FieldByName('SOURCE_ID').Value;
+         Src   :=FieldByName('SRC').Value;
+         PlatID:=FieldByName('PLATFORM_ID').Value;
+         Plat  :=FieldByName('PLATFORM').Value;
+         InstID:=FieldByName('INSTITUTE_ID').Value;
+         Inst  :=FieldByName('INSTITUTE').Value;
+         ProjID:=FieldByName('PROJECT_ID').Value;
+         Proj  :=FieldByName('PROJECT').Value;
+         Ctry  :=FieldByName('COUNTRY').Value;
+         PIName:=FieldByName('PI').Value;
+      end;
+
+      if VarIsNull(CrNum)=true then CrNum:='';
+      if VarIsNull(StNum)=true then StNum:='';
+      if VarIsNull(PiName)=true then PiName:='';
+      if VarIsNull(Depth)=true then Depth:=99999;
+
+        writeln(md,inttostr(ID), #9,
+                   floattostr(Lat), #9,
+                   floattostr(lon), #9,
+                   datetimetostr(date1), #9,
+                   inttostr(depth), #9,
+                   StNum, #9,
+                   inttostr(ver), #9,
+                   inttostr(cast), #9,
+                   inttostr(SrcID), #9,
+                   Src, #9,
+                   inttostr(CrID), #9,
+                   CrNum, #9,
+                   inttostr(PlatID), #9,
+                   Plat, #9,
+                   Ctry, #9,
+                   PIName, #9,
+                   inttostr(instid), #9,
+                   Inst, #9,
+                   Inttostr(ProjID), #9,
+                   Proj);
+     end;
 
        samples_count:=0;
        conv1_count:=0;
@@ -242,11 +320,14 @@ try
   closefile(fo);
   if trim(st)='' then DeleteFile(fn);
 
+  first_tbl:=false;
+
 {C}end; {table is checked }
 
 
 {T}end; {tables cycle}
 finally
+  closefile(md);
   frmdm.Q.EnableControls;
 end;
 
