@@ -108,10 +108,10 @@ const
     'STATION.ID, LATITUDE, LONGITUDE, DATEANDTIME, BOTTOMDEPTH, LASTLEVEL_M, '+
     'LASTLEVEL_DBAR, CRUISE_ID, CAST_NUMBER, ST_NUMBER_ORIGIN, '+
     'QCFLAG, BOTTOMDEPTH_GEBCO, STVERSION  '+
-    'FROM STATION, CRUISE, PLATFORM, COUNTRY, INSTITUTE, PROJECT WHERE '+
+    'FROM STATION, CRUISE, PLATFORM, COUNTRY, INSTITUTE, PROJECT, SOURCE WHERE '+
     'STATION.CRUISE_ID=CRUISE.ID AND CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
     'PLATFORM.COUNTRY_ID=COUNTRY.ID AND CRUISE.INSTITUTE_ID=INSTITUTE.ID AND '+
-    'CRUISE.PROJECT_ID=PROJECT.ID ';
+    'CRUISE.PROJECT_ID=PROJECT.ID AND CRUISE.SOURCE_ID=SOURCE.ID ';
 
 var
   frmosmain: Tfrmosmain;
@@ -402,8 +402,9 @@ try
       if trim(cbPlatform.Text)<>'' then
         SQL_str:=SQL_str+' AND ('+NotCondPlatform+' PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ' else
         if trim(cbCountry.Text)<>'' then
-          SQL_str:=SQL_str+' AND ('+NotCondCountry+' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ' else
-            if trim(cbSource.Text)<>'' then
+          SQL_str:=SQL_str+' AND ('+NotCondCountry+' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ';
+
+    if trim(cbSource.Text)<>'' then
               SQL_str:=SQL_str+' AND ('+NotCondSource+' SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ';
 
   {
@@ -432,20 +433,15 @@ try
         cr:=cbCruise.Text;
      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
      ' CRUISE WHERE '+NotCondSource+' CRUISE.ID = '+cr+')) ';
-    end;
+    end; }
 
     if trim(cbInstitute.Text)<>'' then begin
-     SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-     ' CRUISE, INSTITUTE WHERE CRUISE.INSTITUTE_ID=INSTITUTE.ID AND '+
-     NotCondSource+' INSTITUTE.NAME = '+QuotedStr(cbInstitute.Text)+')) ';
+     SQL_str:=SQL_str+' AND ('+NotCondSource+' INSTITUTE.NAME = '+QuotedStr(cbInstitute.Text)+') ';
     end;
 
     if trim(cbProject.Text)<>'' then begin
-     SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-     ' CRUISE, PROJECT WHERE CRUISE.PROJECT_ID=PROJECT.ID AND '+
-     NotCondSource+' PROJECT.NAME = '+QuotedStr(cbProject.Text)+')) ';
+     SQL_str:=SQL_str+' AND ('+NotCondSource+' PROJECT.NAME = '+QuotedStr(cbProject.Text)+') ';
     end;
-    }
 
     SQL_str:=SQL_str+' AND (STATION.DUPLICATE=FALSE) ';
 
