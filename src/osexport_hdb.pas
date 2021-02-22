@@ -32,7 +32,7 @@ i,j,kt,var_count,stations_count,index :integer;
 station_id,cruise_id,source_id :integer;
 cnt,units_def,units_id,bd,stver,cast,instrument :integer;
 tn,prfn :integer;
-lat,lon,val,val_conv1,lev_dbar,lev_m,DF: real;
+lat,lon,val,val_conv,lev_dbar,lev_m,DF: real;
 fn,tbl,units_name :string;
 cruise_number,PI_name,stno,str,units_sname :string;
 dt :TDateTime;
@@ -165,7 +165,7 @@ writeln(fo,'# ');
 
 {V}if var_count>0 then begin
 
-    //frmexport.Memo2.lines.Add('station_id='+inttostr(station_id));
+    //frmexport.Memo1.lines.Add('station_id='+inttostr(station_id));
     //showmessage('station_id='+inttostr(station_id)+'  variables at station:'+str);
 
     writeln(fo,inttostr(station_id)+#9+'(station_id)');
@@ -189,7 +189,7 @@ writeln(fo,'# ');
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
 
      tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
-     //frmexport.Memo2.lines.Add(tbl);
+     //frmexport.Memo1.lines.Add(tbl);
 
      {...variables at the station}
         st_with_data:=false;
@@ -200,11 +200,12 @@ writeln(fo,'# ');
         SQL.Add(' where id=:station_id ');
         ParamByName('station_id').AsInteger:=station_id;
         Open;
-        if frmdm.q2.IsEmpty=false then begin inc(tn); st_with_data:=true; end;
+        if frmdm.q2.IsEmpty=false then st_with_data:=true;
         Close;
        end;
 
 {SWD}if st_with_data=true then begin
+      inc(tn);
       //showmessage(inttostr(tn)+'  '+tbl);
 
      {...default unit ID}
@@ -242,28 +243,27 @@ writeln(fo,'# ');
        Open;
       end;
 
-{frmdm.q2.Last;
-showmessage('frmdm.q2.RecordCount='+inttostr(frmdm.q2.RecordCount));
-frmdm.q2.First;}
-
 {q2f}if frmdm.q2.IsEmpty=false then begin
 {q2w}while not frmdm.q2.Eof do begin
-      lev_dbar:=frmdm.q2.FieldByName('lev_dbar').AsFloat;           //showmessage('lev_dbar='+floattostr(lev_dbar));
-      lev_m:=frmdm.q2.FieldByName('lev_m').AsFloat;                 //showmessage('lev_m='+floattostr(lev_m));
-      prfn:=frmdm.q2.FieldByName('profile_number').AsInteger;       //showmessage('prf='+inttostr(prfn));
-      instrument:=frmdm.q2.FieldByName('instrument_id').AsInteger;  //showmessage('instrument_id='+inttostr(instrument));
-      val:=frmdm.q2.FieldByName('val').AsFloat;                     //showmessage('val='+floattostr(val));
-      units_id:=frmdm.q2.FieldByName('units_id').AsInteger;         //showmessage('units_id='+inttostr(units_id));
+      lev_dbar:=frmdm.q2.FieldByName('lev_dbar').AsFloat;
+      lev_m:=frmdm.q2.FieldByName('lev_m').AsFloat;
+      prfn:=frmdm.q2.FieldByName('profile_number').AsInteger;
+      instrument:=frmdm.q2.FieldByName('instrument_id').AsInteger;
+      val:=frmdm.q2.FieldByName('val').AsFloat;
+      units_id:=frmdm.q2.FieldByName('units_id').AsInteger;
 
 {conv}if (units_id<>units_def) then begin
         {ICES liter->kg constant density 1.025}
         isconverted:=false;
-        val_conv1:=DF;
-        getdefaultunits(tbl,units_id,units_def,val,val_conv1,isconverted);
-        val:=val_conv1;
-{conv}end;
+        val_conv:=DF;
+        if frmexport.grConversion.ItemIndex=1 then
+        getdefaultunits(tbl,units_id,units_def,val,val_conv,isconverted);
+        if frmexport.grConversion.ItemIndex=1 then
+        GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instrument,prfn,
+                             val,lat,lon,lev_m,val_conv,isconverted);
 
-//showmessage('converted val='+floattostr(val));
+        val:=val_conv;
+{conv}end;
 
       {ipd: instrument_id, profile_number, lev_dbar}
       ipd_exist:=false;
@@ -278,7 +278,7 @@ frmdm.q2.First;}
      if ipd_exist=false then begin
       {0-instrument_id 1-profile_number 2-lev_dbar 3-lev_m, var}
       setlength(DSt, length(DSt)+1, 4+var_count);
-      for j:=0 to (4+var_count) do DSt[High(DSt),j]:=DF;
+      for j:=0 to (3+var_count) do DSt[High(DSt),j]:=DF;
       DSt[High(DSt),0]:=instrument;
       DSt[High(DSt),1]:=prfn;
       DSt[High(DSt),2]:=lev_dbar;
@@ -289,11 +289,6 @@ frmdm.q2.First;}
      {...update record}
      if ipd_exist=true then begin
        DSt[index,tn+3]:=val;
-       {if (DSt[i,0]=7) and (DSt[i,1]=3)
-       then showmessage('inst='+floattostr(DSt[i,0])
-           +'  prf='+floattostr(DSt[i,1])+'  dbar='+floattostr(DSt[i,2])
-           +'  DSt='+floattostr(DSt[index,tn+3])
-           +'  DSt='+floattostr(DSt[index,tn+4]));}
      end;
 
        frmdm.q2.Next;
