@@ -429,9 +429,6 @@ try
 
     SQL_str:=SQL_str+' AND (STATION.DUPLICATE=FALSE) ';
 
-  //  if copy(SQL_str, 1, 4)=' AND'   then SQL_str:=Copy(SQL_str, 5, length(SQL_str));
-
-
     // predefined region
     if pcRegion.ActivePageIndex=1 then begin
 
@@ -450,6 +447,9 @@ try
        ExecSQL;
       end;
       frmdm.TR.CommitRetaining;
+
+      if copy(SQL_str, 1, 4)=' AND' then SQL_str:=Copy(SQL_str, 5, length(SQL_str));
+
 
       with frmdm.q1 do begin
        Close;
@@ -472,7 +472,7 @@ try
            SQL.Add(floattostr(LonMax)+')) ');
          end;
          SQL.Add(' AND '+SQL_str);
-      // showmessage(frmdm.q1.SQL.Text);
+     //  showmessage(frmdm.q1.SQL.Text);
        Open;
       end;
 
@@ -496,7 +496,7 @@ try
        frmdm.q1.Next;
       end;
       frmdm.TR.CommitRetaining;
-      SQL_str:=' STATION.ID IN (SELECT ID FROM TEMPORARY_ID_LIST) ';
+      SQL_str:=' AND STATION.ID IN (SELECT ID FROM TEMPORARY_ID_LIST) ';
     end;
 
    if frmdm.TR.Active=true then frmdm.TR.Commit;
