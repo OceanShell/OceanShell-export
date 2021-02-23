@@ -42,12 +42,6 @@ type
     cbPlatform: TComboBox;
     cbPredefinedRegion: TComboBox;
     cbCountry: TComboBox;
-    chkNOTCountry: TCheckBox;
-    chkNOTInstitute: TCheckBox;
-    chkNOTCruise: TCheckBox;
-    chkNOTPlatform: TCheckBox;
-    chkNOTProject: TCheckBox;
-    chkNOTSource: TCheckBox;
     chkPeriod: TCheckBox;
     cbSource: TComboBox;
     dtpDateMax: TDateTimePicker;
@@ -56,6 +50,12 @@ type
     gbDateandTime: TGroupBox;
     gbRegion: TGroupBox;
     Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
     lbResetSearchStations: TLabel;
     iMeteo: TMenuItem;
     btnExportASCII: TMenuItem;
@@ -333,12 +333,13 @@ try
  DecodeDate(dtpDateMin.Date, SSYearMin, SSMonthMin, SSDayMin);
  DecodeDate(dtpDateMax.Date, SSYearMax, SSMonthMax, SSDayMax);
 
-  if chkNOTCountry.Checked   =true then NotCondCountry   :='NOT' else NotCondCountry   :='';
+{  if chkNOTCountry.Checked   =true then NotCondCountry   :='NOT' else NotCondCountry   :='';
   if chkNOTPlatform.Checked  =true then NotCondPlatform  :='NOT' else NotCondPlatform  :='';
   if chkNOTSource.Checked    =true then NotCondSource    :='NOT' else NotCondSource    :='';
   if chkNOTCruise.Checked    =true then NotCondCruise    :='NOT' else NotCondCruise    :='';
   if chkNOTInstitute.Checked =true then NotCondInstitute :='NOT' else NotCondInstitute :='';
   if chkNOTProject.Checked   =true then NotCondProject   :='NOT' else NotCondProject   :='';
+  }
 
   SQL_str:='';
 
@@ -402,55 +403,28 @@ try
      if Pos('_', cbCruise.Text)>0 then
         cr:=copy(cbCruise.Text, 1, Pos('_', cbCruise.Text)-1) else
         cr:=cbCruise.Text;
-     SQL_str:=SQL_str+' AND ('+NotCondCruise+' CRUISE.ID = '+cr+') ';
+     SQL_str:=SQL_str+' AND (CRUISE.ID = '+cr+') ';
     end;
 
     //if there's a platform but no cruise
     if (trim(cbPlatform.Text)<>'') and (trim(cbCruise.Text)='') then
-     SQL_str:=SQL_str+' AND ('+NotCondPlatform+' PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ' else
+     SQL_str:=SQL_str+' AND (PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ' else
 
     //if there's a country, but no cruise/platform
     if (trim(cbCountry.Text)<>'') and (trim(cbPlatform.Text)='') and (trim(cbCruise.Text)='') then
-     SQL_str:=SQL_str+' AND ('+NotCondCountry+' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ';
+     SQL_str:=SQL_str+' AND (COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ';
 
     //if there's a source but no cruise
     if (trim(cbSource.Text)<>'') and (trim(cbCruise.Text)='') then
-     SQL_str:=SQL_str+' AND ('+NotCondSource+' SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ';
+     SQL_str:=SQL_str+' AND (SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ';
 
-  {
-    if trim(cbSource.Text)<>'' then begin
-     SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-          ' CRUISE, SOURCE WHERE CRUISE.SOURCE_ID=SOURCE.ID AND '+
-          NotCondSource+' SOURCE.NAME = '+QuotedStr(cbSource.Text)+')) ';
-    end;
-
-    if trim(cbPlatform.Text)<>'' then begin
-      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-      ' CRUISE, PLATFORM WHERE CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
-      NotCondSource+' PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+')) ';
-    end;
-
-    if trim(cbCountry.Text)<>'' then begin
-      SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-      ' CRUISE, PLATFORM, COUNTRY WHERE CRUISE.PLATFORM_ID=PLATFORM.ID AND '+
-      ' PLATFORM.COUNTRY_ID=COUNTRY.ID AND '+NotCondSource+
-      ' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+')) ';
-    end;
-
-    if trim(cbCruise.Text)<>'' then begin
-     if Pos('_', cbCruise.Text)>0 then
-        cr:=copy(cbCruise.Text, 1, Pos('_', cbCruise.Text)-1) else
-        cr:=cbCruise.Text;
-     SQL_str:=SQL_str+' AND (STATION.CRUISE_ID IN (SELECT CRUISE.ID FROM '+
-     ' CRUISE WHERE '+NotCondSource+' CRUISE.ID = '+cr+')) ';
-    end; }
 
     if trim(cbInstitute.Text)<>'' then begin
-     SQL_str:=SQL_str+' AND ('+NotCondSource+' INSTITUTE.NAME = '+QuotedStr(cbInstitute.Text)+') ';
+     SQL_str:=SQL_str+' AND (INSTITUTE.NAME = '+QuotedStr(cbInstitute.Text)+') ';
     end;
 
     if trim(cbProject.Text)<>'' then begin
-     SQL_str:=SQL_str+' AND ('+NotCondSource+' PROJECT.NAME = '+QuotedStr(cbProject.Text)+') ';
+     SQL_str:=SQL_str+' AND (PROJECT.NAME = '+QuotedStr(cbProject.Text)+') ';
     end;
 
     SQL_str:=SQL_str+' AND (STATION.DUPLICATE=FALSE) ';
@@ -576,12 +550,12 @@ begin
 
   cbCruise.Enabled:=false;
 
-  chkNOTPlatform.Checked:=false;
+{  chkNOTPlatform.Checked:=false;
   chkNOTCountry.Checked:=false;
   chkNOTSource.Checked:=false;
   chkNOTCruise.Checked:=false;
   chkNOTInstitute.Checked:=false;
-  chkNOTProject.Checked:=false;
+  chkNOTProject.Checked:=false; }
 
   dtpDateMin.DateTime:=StationDateMin;
   dtpDateMax.DateTime:=StationDateMax;

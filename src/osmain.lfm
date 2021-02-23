@@ -1,7 +1,7 @@
 object frmosmain: Tfrmosmain
-  Left = 280
+  Left = 472
   Height = 758
-  Top = 189
+  Top = 112
   Width = 1380
   Caption = 'COMFORT Export'
   ClientHeight = 758
@@ -366,83 +366,11 @@ object frmosmain: Tfrmosmain
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 5
-    object chkNOTPlatform: TCheckBox
-      Left = 24
-      Height = 29
-      Top = 93
-      Width = 125
-      Caption = 'NOT Platform'
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 0
-    end
-    object chkNOTCountry: TCheckBox
-      Left = 24
-      Height = 29
-      Top = 55
-      Width = 121
-      Caption = 'NOT Country'
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 1
-    end
-    object chkNOTSource: TCheckBox
-      Left = 24
-      Height = 29
-      Top = 16
-      Width = 117
-      Caption = 'NOT Source'
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 2
-    end
-    object chkNOTInstitute: TCheckBox
-      Left = 24
-      Height = 29
-      Top = 173
-      Width = 124
-      Caption = 'NOT Institute'
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 3
-    end
-    object chkNOTProject: TCheckBox
-      Left = 24
-      Height = 29
-      Top = 213
-      Width = 115
-      Caption = 'NOT Project'
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 4
-    end
-    object chkNOTCruise: TCheckBox
-      Left = 25
-      Height = 29
-      Top = 133
-      Width = 111
-      Caption = 'NOT Cruise'
-      Font.Color = clWindowText
-      Font.Height = -17
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 5
-    end
     object cbSource: TComboBox
-      Left = 184
+      Left = 104
       Height = 28
       Top = 17
-      Width = 680
+      Width = 760
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       DropDownCount = 10
@@ -452,14 +380,14 @@ object frmosmain: Tfrmosmain
       ItemHeight = 20
       OnDropDown = cbSourceDropDown
       ParentFont = False
-      TabOrder = 6
+      TabOrder = 0
       Text = 'cbSource'
     end
     object cbCountry: TComboBox
-      Left = 184
+      Left = 104
       Height = 28
       Top = 57
-      Width = 680
+      Width = 760
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
@@ -468,14 +396,14 @@ object frmosmain: Tfrmosmain
       ItemHeight = 20
       OnDropDown = cbCountryDropDown
       ParentFont = False
-      TabOrder = 7
+      TabOrder = 1
       Text = 'cbCountry'
     end
     object cbPlatform: TComboBox
-      Left = 184
+      Left = 104
       Height = 28
       Top = 97
-      Width = 680
+      Width = 760
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
@@ -485,14 +413,14 @@ object frmosmain: Tfrmosmain
       OnDropDown = cbPlatformDropDown
       OnSelect = cbPlatformSelect
       ParentFont = False
-      TabOrder = 8
+      TabOrder = 2
       Text = 'cbPlatform'
     end
     object cbCruise: TComboBox
-      Left = 184
+      Left = 104
       Height = 28
       Top = 136
-      Width = 680
+      Width = 760
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Enabled = False
@@ -502,14 +430,14 @@ object frmosmain: Tfrmosmain
       ItemHeight = 20
       OnDropDown = cbCruiseDropDown
       ParentFont = False
-      TabOrder = 9
+      TabOrder = 3
       Text = 'cbCruise'
     end
     object cbInstitute: TComboBox
-      Left = 184
+      Left = 104
       Height = 28
       Top = 176
-      Width = 680
+      Width = 760
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
@@ -518,14 +446,14 @@ object frmosmain: Tfrmosmain
       ItemHeight = 20
       OnDropDown = cbInstituteDropDown
       ParentFont = False
-      TabOrder = 10
+      TabOrder = 4
       Text = 'cbInstitute'
     end
     object cbProject: TComboBox
-      Left = 184
+      Left = 104
       Height = 28
       Top = 213
-      Width = 680
+      Width = 760
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
@@ -534,8 +462,80 @@ object frmosmain: Tfrmosmain
       ItemHeight = 20
       OnDropDown = cbProjectDropDown
       ParentFont = False
-      TabOrder = 11
+      TabOrder = 5
       Text = 'cbProject'
+    end
+    object Label2: TLabel
+      Left = 25
+      Height = 20
+      Top = 25
+      Width = 51
+      Caption = 'Source'
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label3: TLabel
+      Left = 25
+      Height = 20
+      Top = 64
+      Width = 55
+      Caption = 'Country'
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label4: TLabel
+      Left = 25
+      Height = 20
+      Top = 105
+      Width = 59
+      Caption = 'Platform'
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label5: TLabel
+      Left = 25
+      Height = 20
+      Top = 144
+      Width = 45
+      Caption = 'Cruise'
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label6: TLabel
+      Left = 25
+      Height = 20
+      Top = 184
+      Width = 58
+      Caption = 'Institute'
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ParentColor = False
+      ParentFont = False
+    end
+    object Label7: TLabel
+      Left = 25
+      Height = 20
+      Top = 221
+      Width = 49
+      Caption = 'Project'
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      ParentColor = False
+      ParentFont = False
     end
   end
   object btnMap: TBitBtn
