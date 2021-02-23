@@ -98,6 +98,10 @@ begin
  fl := CheckGroup1.Checked[0];
   for i:=0 to CheckGroup1.Items.Count-1 do
     CheckGroup1.Checked[i]:=not fl;
+
+ if fl=false then
+   btnSelectAll.Caption:='Deselect All' else
+   btnSelectAll.Caption:='Select All';
 end;
 
 end.

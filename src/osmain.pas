@@ -55,6 +55,7 @@ type
     gbAuxiliaryParameters: TGroupBox;
     gbDateandTime: TGroupBox;
     gbRegion: TGroupBox;
+    Label1: TLabel;
     lbResetSearchStations: TLabel;
     iMeteo: TMenuItem;
     btnExportASCII: TMenuItem;
@@ -100,6 +101,7 @@ type
   public
     procedure SelectionInfo;
     procedure CDSNavigation;
+    procedure PopulateTblList;
   end;
 
 const
@@ -296,10 +298,11 @@ begin
     cbProject.Text   :=Ini.ReadString ( 'osmain', 'station_project',   '');
     dtpDateMin.DateTime:=Ini.ReadDateTime('osmain', 'station_datemin', now);
     dtpDateMax.DateTime:=Ini.ReadDateTime('osmain', 'station_datemax', now);
-
   finally
     Ini.Free;
   end;
+
+  if cbCruise.Text<>'' then cbCruise.Enabled:=true;
 
   DatabaseInfo;
 end;
@@ -362,8 +365,8 @@ try
   //  if (dtpDateMin.DateTime<>MinDate) or (dtpDateMax.DateTime<>MaxDate) then begin
       if chkPeriod.Checked=false then begin
        SQL_str:=SQL_str+' AND (DATEANDTIME BETWEEN '+
-                        QuotedStr(DateTimeToStr(dtpDateMin.DateTime))+' AND '+
-                        QuotedStr(DateTimeToStr(dtpDateMax.DateTime))+') ';
+                        QuotedStr(DateToStr(dtpDateMin.DateTime))+' AND '+
+                        QuotedStr(DateToStr(dtpDateMax.DateTime))+') ';
       end;
 
      //Date in Period
@@ -393,19 +396,26 @@ try
     end;
   //  end; // dates are not default
 
+
+    // if there's a cruise
     if trim(cbCruise.Text)<>'' then begin
      if Pos('_', cbCruise.Text)>0 then
         cr:=copy(cbCruise.Text, 1, Pos('_', cbCruise.Text)-1) else
         cr:=cbCruise.Text;
      SQL_str:=SQL_str+' AND ('+NotCondCruise+' CRUISE.ID = '+cr+') ';
-    end else
-      if trim(cbPlatform.Text)<>'' then
-        SQL_str:=SQL_str+' AND ('+NotCondPlatform+' PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ' else
-        if trim(cbCountry.Text)<>'' then
-          SQL_str:=SQL_str+' AND ('+NotCondCountry+' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ';
+    end;
 
-    if trim(cbSource.Text)<>'' then
-              SQL_str:=SQL_str+' AND ('+NotCondSource+' SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ';
+    //if there's a platform but no cruise
+    if (trim(cbPlatform.Text)<>'') and (trim(cbCruise.Text)='') then
+     SQL_str:=SQL_str+' AND ('+NotCondPlatform+' PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ' else
+
+    //if there's a country, but no cruise/platform
+    if (trim(cbCountry.Text)<>'') and (trim(cbPlatform.Text)='') and (trim(cbCruise.Text)='') then
+     SQL_str:=SQL_str+' AND ('+NotCondCountry+' COUNTRY.NAME = '+QuotedStr(cbCountry.Text)+') ';
+
+    //if there's a source but no cruise
+    if (trim(cbSource.Text)<>'') and (trim(cbCruise.Text)='') then
+     SQL_str:=SQL_str+' AND ('+NotCondSource+' SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ';
 
   {
     if trim(cbSource.Text)<>'' then begin
@@ -527,8 +537,8 @@ try
      SQL.Add('ORDER BY DATEANDTIME ');
 
      (* Show the query before executing *)
- {   if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
-                  mtInformation, [mbYes, mbNo],0)=mrNo then exit;  }
+  {  if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
+                  mtInformation, [mbYes, mbNo],0)=mrNo then exit; }
 
    // memo1.lines.Add(SQL.Text);
     Open;
@@ -584,7 +594,6 @@ procedure Tfrmosmain.DatabaseInfo;
 var
   TRt_DB1:TSQLTransaction;
   Qt_DB1:TSQLQuery;
-  TempList: TListBox;
   k:integer;
 begin
 
@@ -640,20 +649,7 @@ Qt_DB1.Transaction:=TRt_DB1;
    end;
 
    (* permanent list for parameter tables *)
-   ListBox1.Clear;
-   try
-   (* temporary list for all tables from Db *)
-    TempList:=TListBox.Create(self);
-
-   (* list of all tables *)
-   frmdm.IBDB.GetTableNames(TempList.Items,False);
-
-    for k:=0 to TempList.Items.Count-1 do
-     if (copy(TempList.Items.Strings[k], 1, 2)='P_') then
-       ListBox1.Items.Add(TempList.Items.Strings[k]);
-   finally
-     TempList.Free;
-   end;
+   PopulateTblList;
 
  Finally
   TRt_DB1.Commit;
@@ -774,9 +770,15 @@ begin
     With Qt do begin
      Close;
        SQL.Clear;
-       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
-       SQL.Add(' RIGHT JOIN CRUISE ON ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID ');
+       SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM ');
+       SQL.Add(' PLATFORM, CRUISE, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) ');
+      { SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID '); }
        SQL.Add(' ORDER BY PLATFORM.NAME ');
      Open;
     end;
@@ -787,10 +789,14 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM ');
-       SQL.Add(' PLATFORM, CRUISE, SOURCE WHERE ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
-       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' PLATFORM, CRUISE, SOURCE, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (SOURCE.NAME='+QuotedStr(cbSource.Text)+') ');
        SQL.Add(' ORDER BY PLATFORM.NAME ');
      Open;
     end;
@@ -801,11 +807,15 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
-       SQL.Add(' PLATFORM, CRUISE, SOURCE, COUNTRY WHERE ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
-       SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID AND ');
-       SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCountry.Text));
+       SQL.Add(' PLATFORM, CRUISE, SOURCE, COUNTRY, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
+       SQL.Add(' (PLATFORM.COUNTRY_ID=COUNTRY.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (COUNTRY.NAME='+QuotedStr(cbCountry.Text)+') ');
        SQL.Add(' ORDER BY PLATFORM.NAME ');
      Open;
     end;
@@ -816,12 +826,16 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT PLATFORM.NAME FROM PLATFORM ');
-       SQL.Add(' PLATFORM, CRUISE, SOURCE, COUNTRY WHERE ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
-       SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID AND ');
-       SQL.Add(' COUNTRY.NAME='+QuotedStr(cbCountry.Text)+' AND ');
-       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' PLATFORM, CRUISE, SOURCE, COUNTRY, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
+       SQL.Add(' (PLATFORM.COUNTRY_ID=COUNTRY.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (COUNTRY.NAME='+QuotedStr(cbCountry.Text)+') AND ');
+       SQL.Add(' (SOURCE.NAME='+QuotedStr(cbSource.Text)+') ');
        SQL.Add(' ORDER BY PLATFORM.NAME ');
      Open;
     end;
@@ -861,11 +875,15 @@ begin
     With Qt do begin
      Close;
        SQL.Clear;
-       SQL.Add(' SELECT DISTINCT ID, CRUISE_NUMBER FROM CRUISE ');
-       SQL.Add(' WHERE PLATFORM_ID IN (SELECT ID FROM PLATFORM ');
-       SQL.Add(' WHERE PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+')');
-       SQL.Add(' AND CRUISE.STATIONS_DATABASE>0 ');
-       SQL.Add(' AND DUPLICATE = FALSE ');
+       SQL.Add(' SELECT DISTINCT CRUISE.ID, CRUISE_NUMBER ');
+       SQL.Add(' FROM CRUISE, STATION, PLATFORM ');
+       SQL.Add(' WHERE ');
+       SQL.ADD(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ');
        SQL.Add(' ORDER BY CRUISE_NUMBER ');
      //  showmessage(SQL.Text);
      Qt.Open;
@@ -917,11 +935,17 @@ begin
     With Qt do begin
      Close;
        SQL.Clear;
-       SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM COUNTRY ');
-       SQL.Add(' INNER JOIN PLATFORM ON ');
-       SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID ');
-       SQL.Add(' RIGHT JOIN CRUISE ON ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID ');
+       SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
+       SQL.Add(' COUNTRY, CRUISE, STATION, PLATFORM ');
+       SQL.Add(' WHERE ');
+       SQL.Add(' (PLATFORM.COUNTRY_ID=COUNTRY.ID) AND ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) ');
+      { SQL.Add(' RIGHT JOIN CRUISE ON ');
+       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID '); }
        SQL.Add(' ORDER BY COUNTRY.NAME ');
      Open;
     end;
@@ -932,11 +956,15 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
-       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
-       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
-       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text));
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (COUNTRY.ID=PLATFORM.COUNTRY_ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (SOURCE.NAME='+QuotedStr(cbSource.Text)+') ');
        SQL.Add(' ORDER BY COUNTRY.NAME ');
      Open;
     end;
@@ -947,11 +975,15 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
-       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
-       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
-       SQL.Add(' PLATFORM.NAME='+QuotedStr(cbPlatform.Text));
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (COUNTRY.ID=PLATFORM.COUNTRY_ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (PLATFORM.NAME='+QuotedStr(cbPlatform.Text)+') ');
        SQL.Add(' ORDER BY COUNTRY.NAME ');
      Open;
     end;
@@ -962,12 +994,16 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT COUNTRY.NAME FROM ');
-       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE WHERE ');
-       SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
-       SQL.Add(' COUNTRY.ID=PLATFORM.COUNTRY_ID AND ');
-       SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
-       SQL.Add(' SOURCE.NAME='+QuotedStr(cbSource.Text)+' AND ');
-       SQL.Add(' PLATFORM.NAME='+QuotedStr(cbPlatform.Text));
+       SQL.Add(' COUNTRY, PLATFORM, CRUISE, SOURCE, STATION WHERE ');
+       SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (COUNTRY.ID=PLATFORM.COUNTRY_ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
+       SQL.Add(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
+       SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
+       SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
+       SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
+       SQL.Add(' (SOURCE.NAME='+QuotedStr(cbSource.Text)+') AND ');
+       SQL.Add(' (PLATFORM.NAME='+QuotedStr(cbPlatform.Text)+') ');
        SQL.Add(' ORDER BY COUNTRY.NAME ');
      Open;
     end;
@@ -1249,6 +1285,53 @@ begin
    cbSource.Clear;
    cbInstitute.Clear;
    cbProject.Clear;
+end;
+
+
+procedure Tfrmosmain.PopulateTblList;
+Var
+  TempListAll, TempListPar: TListBox;
+  k, i: integer;
+  tbl: string;
+  fl:boolean;
+begin
+
+    try
+    (* temporary list for all tables from Db *)
+     TempListAll:=TListBox.Create(self);
+
+    (* only parameters *)
+     TempListPar:=TListBox.Create(self);
+
+    (* list of all tables *)
+     frmdm.IBDB.GetTableNames(TempListAll.Items,False);
+     TempListAll.Sorted:=true;
+
+     TempListPar.Clear;
+     with TempListPar.Items do begin
+       Add('P_TEMPERATURE');
+       Add('P_SALINITY');
+       Add('P_OXYGEN');
+     end;
+
+     for k:=0 to TempListAll.Items.Count-1 do begin
+      if (copy(TempListAll.Items.Strings[k], 1, 2)='P_') then begin
+       tbl:=TempListAll.Items.Strings[k];
+        fl:=false;
+        for i:=0 to TempListPar.Count-1 do begin
+         if TempListPar.items.Strings[i]=tbl then fl:=true;
+        end;
+       if fl=false then TempListPar.Items.Add(tbl);
+      end;
+     end;
+
+     for k:=0 to TempListPar.Count-1 do
+      ListBox1.Items.Add(TempListPar.Items.Strings[k]);
+
+    finally
+      TempListAll.Free;
+      TempListPar.Free;
+    end;
 end;
 
 

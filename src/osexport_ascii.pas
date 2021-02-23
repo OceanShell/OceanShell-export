@@ -95,7 +95,7 @@ try
    rewrite(fo);
 
   // if convert=true then
-   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'
+   fstr:='Station_ID'+#9+'[dbar]'+#9+'[m]'+#9+'val'
    +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
    +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'
    +#9+'units_def'+#9+'val_conv1'+#9+'val_conv2';
@@ -106,7 +106,7 @@ try
 
    {...four tables include additional column}
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
-   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'+#9+'count_err'
+   fstr:='Station_ID'+#9+'[dbar]'+#9+'[m]'+#9+'val'+#9+'count_err'
    +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
    +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best';
 
