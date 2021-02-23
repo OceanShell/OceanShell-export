@@ -29,12 +29,12 @@ DAR=Array of Array of double; //dynmic array of real
 Var
 DSt: DAR;
 i,j,kt,var_count,stations_count,index :integer;
-station_id,cruise_id,source_id :integer;
+platform_id,station_id,cruise_id,source_id :integer;
 cnt,units_def,units_id,bd,stver,cast,instrument :integer;
 tn,prfn :integer;
 lat,lon,val,val_conv,lev_dbar,lev_m,DF: real;
 fn,tbl,units_name :string;
-cruise_number,PI_name,stno,str,units_sname :string;
+cruise_number,PI_name,stno,str,units_sname,source_name,platform_name :string;
 dt :TDateTime;
 st_with_data,ipd_exist,isconverted: boolean;
 fo: text;
@@ -101,13 +101,35 @@ writeln(fo,'# ');
     with frmdm.q2 do begin
       Close;
       SQL.Clear;
-      SQL.Add(' select source_id, cruise_number, PI from CRUISE ');
+      SQL.Add(' select platform_id, source_id, cruise_number, PI from CRUISE ');
       SQL.Add(' where id=:cruise_id ');
       ParamByName('cruise_id').AsInteger:=cruise_id;
       Open;
+      platform_id:=FieldByName('platform_id').AsInteger;
       source_id:=FieldByName('source_id').AsInteger;
       cruise_number:=FieldByName('cruise_number').AsString;
       PI_name:=FieldByName('PI').AsString;
+      Close;
+    end;
+      if PI_Name='' then PI_Name:='-9999';
+    with frmdm.q2 do begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' select name from PLATFORM ');
+      SQL.Add(' where id=:platform_id ');
+      ParamByName('platform_id').AsInteger:=platform_id;
+      Open;
+      platform_name:=FieldByName('name').AsString;
+      Close;
+    end;
+    with frmdm.q2 do begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' select name from SOURCE ');
+      SQL.Add(' where id=:source_id ');
+      ParamByName('source_id').AsInteger:=source_id;
+      Open;
+      source_name:=FieldByName('name').AsString;
       Close;
     end;
 
@@ -115,7 +137,7 @@ writeln(fo,'# ');
 
 //check available data at station
     var_count:=0;
-    str:='inst'+#9+'prfn'+#9+'[dbar]'+#9+'[m]';
+    str:='[dbar]'+#9+'[m]'+#9+'inst'+#9+'prfn';
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
     tbl:=frmexport.CheckGroup1.Items.Strings[kt];
@@ -171,6 +193,9 @@ writeln(fo,'# ');
     writeln(fo,inttostr(station_id)+#9+'(station_id)');
     writeln(fo,inttostr(cruise_id)+#9+'(cruise_id)');
     writeln(fo,inttostr(source_id)+#9+'(source_id)');
+    writeln(fo,source_name+#9+'(source_name)');
+    writeln(fo,inttostr(platform_id)+#9+'(platform_id)');
+    writeln(fo,platform_name+#9+'(platform_name)');
     writeln(fo,cruise_number+#9+'(cruise_number)');
     writeln(fo,PI_name+#9+'(PI)');
     writeln(fo,floattostr(lat)+#9+'(latitude deg.)');
@@ -301,12 +326,12 @@ writeln(fo,'# ');
 
 
    for i:=0 to High(DSt) do begin
-   for j:=0 to 3+var_count do begin
-    if j=0 then write(fo,floattostr(DSt[i,j])+#9);
-    if j=1 then write(fo,floattostr(DSt[i,j]));
-    if j=2 then write(fo,#9+floattostrF(DSt[i,j],ffFixed,12,1));
-    if j=3 then write(fo,#9+floattostrF(DSt[i,j],ffFixed,12,1));
-    if j>3 then write(fo,#9+floattostrF(DSt[i,j],ffFixed,12,3));
+    write(fo,   floattostrF(DSt[i,2],ffFixed,12,1)); //lev_dbar
+    write(fo,#9+floattostrF(DSt[i,3],ffFixed,12,1)); //lev_m
+    write(fo,#9+floattostr(DSt[i,0]));               //instrument_id
+    write(fo,#9+floattostr(DSt[i,1]));               //profile_number
+   for j:=4 to 3+var_count do begin
+    write(fo,#9+floattostrF(DSt[i,j],ffFixed,12,3));
    end;
     writeln(fo);
    end;

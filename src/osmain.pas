@@ -1289,6 +1289,15 @@ begin
        Add('P_TEMPERATURE');
        Add('P_SALINITY');
        Add('P_OXYGEN');
+       Add('P_AOU');
+       Add('P_NITRATE');
+       Add('P_NITRITE');
+       Add('P_NITRATENITRITE');
+       Add('P_PHOSPHATE');
+       Add('P_SILICATE');
+       Add('P_PH');
+       Add('P_PHTS25P0');
+       Add('P_PHTSINSITUTP');
      end;
 
      for k:=0 to TempListAll.Items.Count-1 do begin
