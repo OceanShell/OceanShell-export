@@ -263,11 +263,11 @@ object frmosmain: Tfrmosmain
   end
   object gbDateandTime: TGroupBox
     Left = 520
-    Height = 136
+    Height = 165
     Top = 96
     Width = 400
     Caption = 'Date'
-    ClientHeight = 111
+    ClientHeight = 140
     ClientWidth = 396
     Font.Color = clWindowText
     Font.Height = -17
@@ -276,10 +276,10 @@ object frmosmain: Tfrmosmain
     ParentFont = False
     TabOrder = 4
     object dtpDateMin: TDateTimePicker
-      Left = 56
+      Left = 24
       Height = 28
-      Top = 16
-      Width = 114
+      Top = 15
+      Width = 194
       CenturyFrom = 1941
       MaxDate = 2958465
       MinDate = -53780
@@ -291,7 +291,7 @@ object frmosmain: Tfrmosmain
       TrailingSeparator = False
       TextForNullDate = 'NULL'
       LeadingZeros = True
-      Kind = dtkDate
+      Kind = dtkDateTime
       TimeFormat = tf24
       TimeDisplay = tdHMS
       DateMode = dmComboBox
@@ -302,10 +302,10 @@ object frmosmain: Tfrmosmain
       MonthNames = 'Long'
     end
     object dtpDateMax: TDateTimePicker
-      Left = 240
+      Left = 24
       Height = 28
-      Top = 16
-      Width = 114
+      Top = 56
+      Width = 194
       CenturyFrom = 1941
       MaxDate = 2958465
       MinDate = -53780
@@ -317,7 +317,7 @@ object frmosmain: Tfrmosmain
       TrailingSeparator = False
       TextForNullDate = 'NULL'
       LeadingZeros = True
-      Kind = dtkDate
+      Kind = dtkDateTime
       TimeFormat = tf24
       TimeDisplay = tdHMS
       DateMode = dmComboBox
@@ -328,9 +328,9 @@ object frmosmain: Tfrmosmain
       MonthNames = 'Long'
     end
     object chkPeriod: TCheckBox
-      Left = 56
+      Left = 24
       Height = 29
-      Top = 56
+      Top = 96
       Width = 75
       Caption = 'Period'
       Font.Color = clWindowText

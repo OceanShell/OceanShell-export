@@ -365,8 +365,8 @@ try
   //  if (dtpDateMin.DateTime<>MinDate) or (dtpDateMax.DateTime<>MaxDate) then begin
       if chkPeriod.Checked=false then begin
        SQL_str:=SQL_str+' AND (DATEANDTIME BETWEEN '+
-                        QuotedStr(DateToStr(dtpDateMin.DateTime))+' AND '+
-                        QuotedStr(DateToStr(dtpDateMax.DateTime))+') ';
+                        QuotedStr(DateTimeToStr(dtpDateMin.DateTime))+' AND '+
+                        QuotedStr(DateTimeToStr(dtpDateMax.DateTime))+') ';
       end;
 
      //Date in Period
@@ -641,9 +641,12 @@ Qt_DB1.Transaction:=TRt_DB1;
            seLonMin.Value:=StationLonMin;
            seLonMax.Value:=StationLonMax;
 
-           dtpDateMin.DateTime:=StationDateMin;
-           dtpDateMax.DateTime:=StationDateMax;
+           dtpDateMin.Date:=StationDateMin;
+           dtpDateMax.Date:=StationDateMax;
        end;
+
+       dtpDateMin.Time:=EncodeTime(0, 0, 0, 0);
+       dtpDateMax.Time:=EncodeTime(23, 59, 59, 999);
       end;
     Close;
    end;
