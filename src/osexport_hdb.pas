@@ -33,7 +33,7 @@ platform_id,station_id,cruise_id,source_id :integer;
 cnt,units_def,units_id,bd,stver,cast,instrument :integer;
 tn,prfn :integer;
 lat,lon,val,val_conv,lev_dbar,lev_m,DF: real;
-fn,tbl,units_name :string;
+fn,tbl :string;
 cruise_number,PI_name,stno,str,units_sname,source_name,platform_name :string;
 dt :TDateTime;
 st_with_data,ipd_exist,isconverted: boolean;
@@ -44,7 +44,9 @@ begin
 fn:=user_path+'data.txt';
 assignfile(fo,fn);
 rewrite(fo);
+
 DF:=-9999; //default value for missing observations
+setlength(DSt,0,0); //initialize dynamic array of arrays
 
 writeln(fo,'# information');
 writeln(fo,'# ');
@@ -84,6 +86,7 @@ writeln(fo,'# ');
     stations_count:=0;
 {Q}while not frmdm.Q.EOF do begin
     inc(stations_count); //current counter
+    ProgressTaskbar(stations_count, cnt); // windows progressbar
 
     station_id :=frmdm.Q.FieldByName('id').Value;
     cruise_id:=frmdm.Q.FieldByName('cruise_id').Value;
@@ -133,8 +136,6 @@ writeln(fo,'# ');
       Close;
     end;
 
-    ProgressTaskbar(stations_count, cnt); // windows progressbar
-
 //check available data at station
     var_count:=0;
     str:='[dbar]'+#9+'[m]'+#9+'inst'+#9+'prfn';
@@ -177,7 +178,6 @@ writeln(fo,'# ');
     ParamByName('units_def').AsInteger:=units_def;
     Open;
     units_sname:=FieldByName('name_short').AsString;
-    units_name:=FieldByName('name').AsString;
     Close;
    end;
    str:=str+#9+tbl+'('+units_sname+')';
@@ -189,25 +189,6 @@ writeln(fo,'# ');
 
     //frmexport.Memo1.lines.Add('station_id='+inttostr(station_id));
     //showmessage('station_id='+inttostr(station_id)+'  variables at station:'+str);
-
-    writeln(fo,inttostr(station_id)+#9+'(station_id)');
-    writeln(fo,inttostr(cruise_id)+#9+'(cruise_id)');
-    writeln(fo,inttostr(source_id)+#9+'(source_id)');
-    writeln(fo,source_name+#9+'(source_name)');
-    writeln(fo,inttostr(platform_id)+#9+'(platform_id)');
-    writeln(fo,platform_name+#9+'(platform_name)');
-    writeln(fo,cruise_number+#9+'(cruise_number)');
-    writeln(fo,PI_name+#9+'(PI)');
-    writeln(fo,floattostr(lat)+#9+'(latitude deg.)');
-    writeln(fo,floattostr(lon)+#9+'(longitude deg.)');
-    writeln(fo,datetimetostr(dt)+#9+'(station date and time)');
-    writeln(fo,inttostr(bd)+#9+'(bottom depth)');
-    writeln(fo,stno+#9+'(st_number_origin)');
-    writeln(fo,inttostr(stver)+#9+'(station version)');
-    writeln(fo,inttostr(cast)+#9+'(cast number)');
-    writeln(fo,inttostr(var_count)+#9+'(number of variables at station)');
-    writeln(fo,str);
-    //writeln(fo,'....................');
 
       tn:=0; //table sequential number in DSt
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
@@ -253,7 +234,6 @@ writeln(fo,'# ');
        ParamByName('units_def').AsInteger:=units_def;
        Open;
        units_sname:=FieldByName('name_short').AsString;
-       units_name:=FieldByName('name').AsString;
        Close;
      end;
      {...profile/profiles}
@@ -281,9 +261,11 @@ writeln(fo,'# ');
         {ICES liter->kg constant density 1.025}
         isconverted:=false;
         val_conv:=DF;
-        if frmexport.grConversion.ItemIndex=1 then
+        //if frmexport.grConversion.ItemIndex=1 then
+        if conv=0 then
         getdefaultunits(tbl,units_id,units_def,val,val_conv,isconverted);
-        if frmexport.grConversion.ItemIndex=1 then
+        //if frmexport.grConversion.ItemIndex=1 then
+        if conv=1 then
         GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instrument,prfn,
                              val,lat,lon,lev_m,val_conv,isconverted);
 
@@ -324,6 +306,47 @@ writeln(fo,'# ');
 {C}end;
 {T}end;
 
+{...output start}
+if stations_count=1 then begin
+writeln(fo,inttostr(station_id)+#9+'(station_id)');
+writeln(fo,inttostr(cruise_id)+#9+'(cruise_id)');
+writeln(fo,inttostr(source_id)+#9+'(source_id)');
+writeln(fo,source_name+#9+'(source_name)');
+writeln(fo,inttostr(platform_id)+#9+'(platform_id)');
+writeln(fo,platform_name+#9+'(platform_name)');
+writeln(fo,cruise_number+#9+'(cruise_number)');
+writeln(fo,PI_name+#9+'(PI)');
+writeln(fo,floattostr(lat)+#9+'(latitude deg.)');
+writeln(fo,floattostr(lon)+#9+'(longitude deg.)');
+writeln(fo,datetimetostr(dt)+#9+'(station date and time)');
+writeln(fo,inttostr(bd)+#9+'(bottom depth)');
+writeln(fo,stno+#9+'(st_number_origin)');
+writeln(fo,inttostr(stver)+#9+'(station version)');
+writeln(fo,inttostr(cast)+#9+'(cast number)');
+writeln(fo,inttostr(var_count)+#9+'(number of variables at station)');
+writeln(fo,inttostr(High(DSt))+#9+'(number of records at station)');
+writeln(fo,str);
+end
+else begin
+writeln(fo,inttostr(station_id));
+writeln(fo,inttostr(cruise_id));
+writeln(fo,inttostr(source_id));
+writeln(fo,source_name);
+writeln(fo,inttostr(platform_id));
+writeln(fo,platform_name);
+writeln(fo,cruise_number);
+writeln(fo,PI_name);
+writeln(fo,floattostr(lat));
+writeln(fo,floattostr(lon));
+writeln(fo,datetimetostr(dt));
+writeln(fo,inttostr(bd));
+writeln(fo,stno);
+writeln(fo,inttostr(stver));
+writeln(fo,inttostr(cast));
+writeln(fo,inttostr(var_count));
+writeln(fo,inttostr(High(DSt)));
+writeln(fo,str);
+end;
 
    for i:=0 to High(DSt) do begin
     write(fo,   floattostrF(DSt[i,2],ffFixed,12,1)); //lev_dbar
@@ -331,10 +354,11 @@ writeln(fo,'# ');
     write(fo,#9+floattostr(DSt[i,0]));               //instrument_id
     write(fo,#9+floattostr(DSt[i,1]));               //profile_number
    for j:=4 to 3+var_count do begin
-    write(fo,#9+floattostrF(DSt[i,j],ffFixed,12,3));
+    write(fo,#9+floattostrF(DSt[i,j],ffFixed,12,3)); //variables
    end;
     writeln(fo);
    end;
+{...output end}
 
     setlength(DSt,0,0);
 {V}end;
