@@ -7,11 +7,11 @@ interface
 uses
   Classes, SysUtils;
 
-procedure ExportNetCDF(user_path:string);
+procedure ExportNetCDF(user_path:string; conv:integer);
 
 implementation
 
-procedure ExportNetCDF(user_path:string);
+procedure ExportNetCDF(user_path:string; conv:integer);
 begin
   //
 end;

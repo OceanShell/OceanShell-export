@@ -11,7 +11,7 @@ uses
   osmain, dm, osexport, osunitsconversion, procedures;
 
 
-procedure ExportASCII(user_path:string);
+procedure ExportASCII(user_path:string; conv:integer);
 
 implementation
 
@@ -27,21 +27,20 @@ begin
 end;
 
 
-procedure ExportASCII(user_path:string);
+procedure ExportASCII(user_path:string; conv:integer);
 var
-kt,ks,mik, ID, cnt: integer;
+kt,ID, cnt, conv_count: integer;
 Lat, Lon:real;
-tbl_count,units_count,samples_count,samples_total,conv1_count,conv2_count :integer;
 units_def,station_id :integer;
 step,row1,row2,sel_size :integer;
-conv1_min,conv1_max,conv2_min,conv2_max :real;
-conv1_md,conv2_md :double;
+conv_min,conv_max :real;
+conv_md:double;
 tbl,fn,units_name,fstr,st :string;
 convert,isconverted,best :boolean;
 DT1,DT2: TDateTime;
 
 {P_tables}
-lev_dbar,lev_m,val,valerr,val_conv1,val_conv2 :real;
+lev_dbar,lev_m,val,valerr,val_conv:real;
 PQF1,PQF2,SQF,WQF :integer;
 btl_num,units_id,instr_id,prf_num,prf_best :integer;
 fo, md: text;
@@ -94,15 +93,10 @@ try
    assignfile(fo,fn);
    rewrite(fo);
 
-  // if convert=true then
    fstr:='Station_ID'+#9+'[dbar]'+#9+'[m]'+#9+'val'
    +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
    +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'
-   +#9+'units_def'+#9+'val_conv1'+#9+'val_conv2';
- {  if convert=false then
-   fstr:='id'+#9+'[dbar]'+#9+'[m]'+#9+'val'
-   +#9+'PQF1'+#9+'PQF2'+#9+'SQF'+#9+'WOCEQF'
-   +#9+'niskin'+#9+'units_id'+#9+'instrument_id'+#9+'prf_num'+#9+'prf_best'; }
+   +#9+'units_def'+#9+'val_conv';
 
    {...four tables include additional column}
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
@@ -187,17 +181,11 @@ try
                    Proj);
      end;
 
-       samples_count:=0;
-       conv1_count:=0;
-       conv2_count:=0;
-       conv1_min:=9999;
-       conv1_max:=-9999;
-       conv1_md:=0;
-       conv2_min:=9999;
-       conv2_max:=-9999;
-       conv2_md:=0;
 
- //  frmexport.memo1.lines.Add(tbl+'   '+inttostr(id));
+       conv_count:=0;
+       conv_min:=9999;
+       conv_max:=-9999;
+       conv_md:=0;
 
    with frmdm.q1 do begin
      Close;
@@ -209,14 +197,10 @@ try
      Open;
    end;
 
-  // showmessage('here');
    while not frmdm.q1.EOF do begin
 
    WQF:=9;
-   val_conv1:=-9999;
-   val_conv2:=-9999;
-
- //  showmessage('here1');
+   val_conv:=-9999;
 
    station_id:=frmdm.q1.FieldByName('id').Value;
    lev_dbar:=frmdm.q1.FieldByName('lev_dbar').Value;
@@ -230,8 +214,6 @@ try
    prf_num:=frmdm.q1.FieldByName('profile_number').Value;
    best:=frmdm.q1.FieldByName('profile_best').Value;
 
-  //// showmessage('here2');
-
    if not VarIsNull(frmdm.q1.FieldByName('bottle_number').Value) then
      btl_num:=frmdm.q1.FieldByName('bottle_number').Value else btl_num:=-9;
 
@@ -243,26 +225,17 @@ try
    {convert OCEAN QF to WOCE}
    qf_ocean_to_woce(PQF2,WQF);
 
-   if units_id=units_def then begin
-     val_conv1:=val;
-     val_conv2:=val;
-   end;
-
-  // showmessage('here3');
+   if units_id=units_def then val_conv:=val;
 
    {CONVERSION}
    if units_id<>units_def then begin
-
      isconverted:=false;
-     //ICES
-     GetDefaultUnits(tbl,units_id,units_def,val,val_conv1,isconverted);
+     if conv=0 then //ICES
+       GetDefaultUnits(tbl,units_id,units_def,val,val_conv,isconverted);
 
-    //Advanced
-     GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv2,isconverted);
-
+     if conv=1 then //Advanced
+       GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv,isconverted);
    end;
-
-  // showmessage('here4');
 
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
    writeln(fo,inttostr(station_id)
@@ -280,8 +253,7 @@ try
   +#9+inttostr(prf_num)
   +#9+inttostr(prf_best)
   +#9+inttostr(units_def)
-  +#9+floattostrF(val_conv1,ffFixed,12,5)
-  +#9+floattostrF(val_conv2,ffFixed,12,5))
+  +#9+floattostrF(val_conv,ffFixed,12,5))
   else
     writeln(fo,inttostr(station_id)
    +#9+floattostrF(lev_dbar,ffFixed,9,1)
@@ -297,22 +269,15 @@ try
    +#9+inttostr(prf_num)
    +#9+inttostr(prf_best)
    +#9+inttostr(units_def)
-   +#9+floattostrF(val_conv1,ffFixed,12,5)
-   +#9+floattostrF(val_conv2,ffFixed,12,5));
+   +#9+floattostrF(val_conv,ffFixed,12,5));
 
 
 {PQF2}if PQF2>=3 then begin
-  if val_conv1<>-9999 then begin
-    conv1_count:=conv1_count+1;
-    conv1_md:=conv1_md+val_conv1;
-    if conv1_min>val_conv1 then conv1_min:=val_conv1;
-    if conv1_max<val_conv1 then conv1_max:=val_conv1;
-  end;
-  if val_conv2<>-9999 then begin
-    conv2_count:=conv2_count+1;
-    conv2_md:=conv2_md+val_conv2;
-    if conv2_min>val_conv2 then conv2_min:=val_conv2;
-    if conv2_max<val_conv2 then conv2_max:=val_conv2;
+  if val_conv<>-9999 then begin
+    conv_count:=conv_count+1;
+    conv_md:=conv_md+val_conv;
+    if conv_min>val_conv then conv_min:=val_conv;
+    if conv_max<val_conv then conv_max:=val_conv;
   end;
 {PQF2}end;
 

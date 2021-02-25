@@ -5,8 +5,8 @@ object frmexport: Tfrmexport
   Width = 1098
   BorderStyle = bsSingle
   Caption = 'Export'
-  ClientHeight = 0
-  ClientWidth = 0
+  ClientHeight = 595
+  ClientWidth = 1098
   DesignTimePPI = 144
   OnShow = FormShow
   Position = poScreenCenter

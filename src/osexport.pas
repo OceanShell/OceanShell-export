@@ -19,9 +19,11 @@ type
     Memo1: TMemo;
     RadioGroup1: TRadioGroup;
     grConversion: TRadioGroup;
+
     procedure btnExportClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnSelectAllClick(Sender: TObject);
+
   private
 
   public
@@ -72,9 +74,9 @@ begin
   memo1.Lines.Add(datetimetostr(DT1));
 
   case RadioGroup1.ItemIndex of
-   0: osexport_ascii.ExportASCII(user_path);
+   0: osexport_ascii.ExportASCII(user_path, grConversion.ItemIndex);
    1: osexport_hdb.ExportHDB(user_path, grConversion.ItemIndex); //0-ices, 1-precise
-   2: osexport_netcdf.ExportNetCDF(user_path);
+   2: osexport_netcdf.ExportNetCDF(user_path, grConversion.ItemIndex);
   end;
 
   DT2:=Now;
