@@ -1,0 +1,6 @@
+[firebird]
+dbpath=c:\Users\ako071\AK\OceanShell-GIT\OceanShell\databases\COMFORT_v1.FDB
+host=localhost
+port=3050
+user=SYSDBA
+pass=masterkey

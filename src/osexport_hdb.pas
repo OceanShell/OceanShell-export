@@ -114,7 +114,6 @@ writeln(fo,'# ');
       PI_name:=FieldByName('PI').AsString;
       Close;
     end;
-      if PI_Name='' then PI_Name:='-9999';
     with frmdm.q2 do begin
       Close;
       SQL.Clear;
@@ -307,6 +306,12 @@ writeln(fo,'# ');
 {T}end;
 
 {...output start}
+
+if PI_Name='' then PI_Name:='-9999';
+if platform_name='' then platform_name:='-9999';
+if cruise_number='' then cruise_number:='-9999';
+if stno='' then stno:='-9999';
+
 if stations_count=1 then begin
 writeln(fo,inttostr(station_id)+#9+'(station_id)');
 writeln(fo,inttostr(cruise_id)+#9+'(cruise_id)');
