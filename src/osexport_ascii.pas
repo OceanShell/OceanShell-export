@@ -231,7 +231,7 @@ try
    if units_id<>units_def then begin
      isconverted:=false;
      if conv=0 then //ICES
-       GetDefaultUnits(tbl,units_id,units_def,val,val_conv,isconverted);
+       GetDefaultUnits(tbl,units_id,units_def,val,1.025,val_conv,isconverted);
 
      if conv=1 then //Advanced
        GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instr_id,prf_num,val,lat,lon,lev_m,val_conv,isconverted);

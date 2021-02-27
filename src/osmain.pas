@@ -36,6 +36,7 @@ type
     btnExport: TBitBtn;
     btnMap: TBitBtn;
     btnSelect: TBitBtn;
+    btnDensity: TButton;
     cbInstitute: TComboBox;
     cbCruise: TComboBox;
     cbProject: TComboBox;
@@ -77,12 +78,14 @@ type
     TabSheet1: TTabSheet;
     TabSheet3: TTabSheet;
 
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+
+    procedure btnDensityClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
     procedure cbCruiseDropDown(Sender: TObject);
     procedure cbProjectDropDown(Sender: TObject);
     procedure cbPlatformSelect(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure lbResetSearchStationsClick(Sender: TObject);
     procedure btnMapClick(Sender: TObject);
     procedure btnSelectClick(Sender: TObject);
@@ -162,6 +165,7 @@ uses
 (* core modules *)
   dm,
   ArbytraryRegion,
+  osdensity,
 
 (* data export *)
   osexport,
@@ -228,7 +232,6 @@ begin
       if MessageDlg(e.message, mtError, [mbOk], 0)=mrOk then close;
   end;
 end;
-
 
 procedure Tfrmosmain.FormShow(Sender: TObject);
 Var
@@ -1212,6 +1215,11 @@ begin
      frmexport.Free;
      frmexport := nil;
    end;
+end;
+
+procedure Tfrmosmain.btnDensityClick(Sender: TObject);
+begin
+  PopulateDensityTbl;
 end;
 
 

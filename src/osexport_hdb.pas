@@ -262,7 +262,7 @@ writeln(fo,'# ');
         val_conv:=DF;
         //if frmexport.grConversion.ItemIndex=1 then
         if conv=0 then
-        getdefaultunits(tbl,units_id,units_def,val,val_conv,isconverted);
+        getdefaultunits(tbl,units_id,units_def,val,1.025,val_conv,isconverted);
         //if frmexport.grConversion.ItemIndex=1 then
         if conv=1 then
         GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instrument,prfn,

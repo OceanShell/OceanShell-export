@@ -7,8 +7,8 @@ interface
 uses
   Classes, SysUtils, SQLDB, osmain, dm, gibbsseawater, dynlibs;
 
-procedure GetDefaultUnits(par:string; units, units_default: integer; val_in: real;
-  Var val_out:real; Var isconverted:boolean);
+procedure GetDefaultUnits(par:string; units, units_default: integer;
+  val_in, dens: real; Var val_out:real; Var isconverted:boolean);
 
 procedure GetDefaultUnitsExact(par:string; units, units_default, ID,
   instr_id, prof_num: integer; val_in, Lat, Lon, LEV_M: real;
@@ -18,36 +18,36 @@ procedure GetDefaultUnitsExact(par:string; units, units_default, ID,
 implementation
 
 
-procedure  GetDefaultUnits(par:string; units, units_default: integer; val_in: real;
-  Var val_out:real; Var isconverted:boolean);
+procedure  GetDefaultUnits(par:string; units, units_default: integer;
+  val_in, dens: real; Var val_out:real; Var isconverted:boolean);
 begin
  val_out:=-9999;
 
  if (par='P_ALKALINITY') then begin
    (* Milli-equivalent per liter (5) -> Micro-mole per kilogram (3) *)
-   if (units=5) and (units_default=3) then val_out:=val_in*1000/1.025; //≈ 2000-2500
+   if (units=5) and (units_default=3) then val_out:=val_in*1000/dens; //≈ 2000-2500
  end;
 
 
  if (par='P_AMMONIUM') then begin
    (* Micro-gram per liter (4) ->    Micro-gram per kilogram (14) *)
-   if (units=4) and (units_default=14) then val_out:=val_in/1.025;
+   if (units=4) and (units_default=14) then val_out:=val_in/dens;
  end;
 
  if (par='P_CHLOROPHYLL') then begin
    (* Micro-gram per liter (4) ->    Micro-gram per kilogram (14) *)
-   if (units=4) and (units_default=14) then val_out:=val_in/1.025;
+   if (units=4) and (units_default=14) then val_out:=val_in/dens;
  end;
 
 
  if (par='P_DIC') then begin
    (* Milli-mole per liter (7) -> Micro-mole per kilogram (3) *)
-   if (units=7) and (units_default=3) then val_out:=val_in*1000/1.025;
+   if (units=7) and (units_default=3) then val_out:=val_in*1000/dens;
  end;
 
  if (par='P_DIN') then begin
    (* Micro-gram per liter (4) -> Micro-gram per kilogram (14) *)
-   if (units=4) and (units_default=14) then val_out:=val_in/1.025;
+   if (units=4) and (units_default=14) then val_out:=val_in/dens;
  end;
 
  if (par='P_SF6') then begin
@@ -62,7 +62,7 @@ begin
      1 mg-at/l = 15.994x22.391/31.998 = 11.192 ml}
 
    (* Milliliter per liter to Micro-mole per kilogram *)
-   if (units=21) and (units_default=3) then val_out:=44.661*val_in/1.025; //g/l ≈ g/kg × 1.025
+   if (units=21) and (units_default=3) then val_out:=44.661*val_in/dens; //g/l ≈ g/kg × 1.025
  end;
 
  if (par='P_NITRATE') or (par='P_NITRATENITRITE') then begin
@@ -73,7 +73,7 @@ begin
    MW N = 14.006720}
 
    (* Micro-gram per liter to Micro-mole per kilogram *)
-   if (units=4)  and (units_default=3) then val_out:=0.071394*val_in/1.025; //g/l ≈ g/kg × 1.025
+   if (units=4)  and (units_default=3) then val_out:=0.071394*val_in/dens; //g/l ≈ g/kg × 1.025
    (* Micro-gram per kilogram to Micro-mole per kilogram *)
    if (units=14) and (units_default=3) then val_out:=0.071394*val_in;
    (* Micro-gram-atom per kilogram to Micro-mole per kilogram *)
@@ -88,7 +88,7 @@ begin
     MW N = 14.006720}
 
    (* Micro-gram per liter to Micro-mole per kilogram *)
-   if (units=4)  and (units_default=3) then val_out:=0.071394*val_in/1.025; //g/l ≈ g/kg × 1.025
+   if (units=4)  and (units_default=3) then val_out:=0.071394*val_in/dens; //g/l ≈ g/kg × 1.025
    (* Micro-gram per kilogram to Micro-mole per kilogram *)
    if (units=14) and (units_default=3) then val_out:=0.071394*val_in;
    (* Micro-gram-atom per kilogram to Micro-mole per kilogram *)
@@ -104,7 +104,7 @@ begin
      MW P = 30.973762}
 
      (* Micro-gram per liter to Micro-mole per kilogram *)
-     if (units=4)  and (units_default=3) then val_out:=0.032285*val_in/1.025;
+     if (units=4)  and (units_default=3) then val_out:=0.032285*val_in/dens;
      (* Micro-gram per kilogram to Micro-mole per kilogram *)
      if (units=14) and (units_default=3) then val_out:=0.032285*val_in; //g/l ≈ g/kg × 1.025
      (* Micro-gram-atom per kilogram to Micro-mole per kilogram *)
@@ -120,7 +120,7 @@ begin
      MW Si = 28.085530}
 
      (* Micro-gram per liter to Micro-mole per kilogram *)
-     if (units=4)  and (units_default=3) then val_out:=0.03561*val_in/1.025;
+     if (units=4)  and (units_default=3) then val_out:=0.03561*val_in/dens;
      (* Micro-gram per kilogram to Micro-mole per kilogram *)
      if (units=14) and (units_default=3) then val_out:=0.03561*val_in; //g/l ≈ g/kg × 1.025
      (* Micro-gram-atom per kilogram to Micro-mole per kilogram *)
