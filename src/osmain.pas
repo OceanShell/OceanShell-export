@@ -226,7 +226,7 @@ begin
       Params.Add('WireCompression=true');
       Connected:=true;
     end;
-    caption:='Export ['+DBHost+': '+DBPath+']';
+    caption:='OceanShell-Export ['+DBHost+': '+DBPath+']';
   except
     on e: Exception do
       if MessageDlg(e.message, mtError, [mbOk], 0)=mrOk then close;
