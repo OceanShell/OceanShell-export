@@ -1,19 +1,19 @@
 object frmabout: Tfrmabout
   Left = 682
-  Height = 334
+  Height = 374
   Top = 326
   Width = 444
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'About the program'
-  ClientHeight = 334
+  ClientHeight = 374
   ClientWidth = 444
   DesignTimePPI = 144
   Position = poMainFormCenter
   LCLVersion = '2.0.6.0'
   object Memo1: TMemo
     Left = 10
-    Height = 314
+    Height = 354
     Top = 10
     Width = 424
     Align = alClient
@@ -30,10 +30,11 @@ object frmabout: Tfrmabout
       'AlexanderA.Korablev@gmail.com'
       'Are.Olsen@uib.no'
       ''
-      'Copyright (C) 2020-2021'
+      'Authors:'
       'Alexander Korablev'
-      'University of Bergen (UiB)'
+      'Alexander Smirnov'
       ''
+      '© 2020-2021, University of Bergen (UiB)'
     )
     ReadOnly = True
     TabOrder = 0

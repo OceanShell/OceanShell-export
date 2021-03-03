@@ -335,9 +335,9 @@ if dtpDateMax.Date<dtpDateMin.Date then
     if MessageDlg('End date exceeds the beginning date',
        mtWarning, [mbOk], 0)=mrOk then exit;
 
-if SSYearMax-SSYearMin>=10 then
+{if SSYearMax-SSYearMin>=10 then
   if MessageDlg('You are about to select a large amount of data. Proceed?',
-     mtWarning, [mbYes, mbNo], 0)=mrNo then exit;
+     mtWarning, [mbYes, mbNo], 0)=mrNo then exit;}
 
 try
 // frmdm.Q.DisableControls;
@@ -462,8 +462,15 @@ Application.ProcessMessages;
       with frmdm.q1 do begin
        Close;
          SQL.Clear;
-         SQL.Add(' SELECT ID, LATITUDE, LONGITUDE FROM STATION ');
+         SQL.Add(' SELECT STATION.ID, LATITUDE, LONGITUDE ');
+         SQL.Add(' FROM STATION, CRUISE, PLATFORM, COUNTRY, INSTITUTE, PROJECT, SOURCE ');
          SQL.Add(' WHERE ');
+         SQL.Add(' STATION.CRUISE_ID=CRUISE.ID AND ');
+         SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+         SQL.Add(' PLATFORM.COUNTRY_ID=COUNTRY.ID AND ');
+         SQL.Add(' CRUISE.INSTITUTE_ID=INSTITUTE.ID AND ');
+         SQL.Add(' CRUISE.PROJECT_ID=PROJECT.ID AND ');
+         SQL.Add(' CRUISE.SOURCE_ID=SOURCE.ID AND ');
          SQL.Add(' (LATITUDE BETWEEN ' );
          SQL.Add(floattostr(LatMin)+' AND ');
          SQL.Add(floattostr(LatMax)+') AND ');
@@ -480,7 +487,7 @@ Application.ProcessMessages;
            SQL.Add(floattostr(LonMax)+')) ');
          end;
          SQL.Add(' AND '+SQL_str);
-     //  showmessage(frmdm.q1.SQL.Text);
+      // showmessage(frmdm.q1.SQL.Text);
        Open;
       end;
 

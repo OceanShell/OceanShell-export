@@ -17,7 +17,7 @@ type
     CheckGroup1: TCheckGroup;
     btnSelectAll: TLabel;
     Memo1: TMemo;
-    RadioGroup1: TRadioGroup;
+    rgFormat: TRadioGroup;
     grConversion: TRadioGroup;
 
     procedure btnExportClick(Sender: TObject);
@@ -45,6 +45,8 @@ uses osmain, osexport_ascii, osexport_hdb, osexport_netcdf;
 procedure Tfrmexport.FormShow(Sender: TObject);
 begin
   CheckGroup1.items:=frmosmain.ListBox1.Items;
+
+  TRadioButton(rgFormat.Controls[2]).Enabled := False;
 end;
 
 procedure Tfrmexport.btnExportClick(Sender: TObject);
@@ -73,7 +75,7 @@ begin
   memo1.Lines.Add('...start: ');
   memo1.Lines.Add(datetimetostr(DT1));
 
-  case RadioGroup1.ItemIndex of
+  case rgFormat.ItemIndex of
    0: osexport_ascii.ExportASCII(user_path, grConversion.ItemIndex);
    1: osexport_hdb.ExportHDB(user_path, grConversion.ItemIndex); //0-ices, 1-precise
    2: osexport_netcdf.ExportNetCDF(user_path, grConversion.ItemIndex);

@@ -73,11 +73,25 @@ procedure Tfrmmap.ChangeID(ID:integer);
 begin
   MainGlobe.ChangeID(ID);
 
+  with frmdm.q1 do begin
+    Close;
+     SQL.Clear;
+     SQL.Add(' SELECT PLATFORM.NAME, CRUISE_NUMBER ');
+     SQL.Add(' FROM CRUISE, PLATFORM WHERE ');
+     SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
+     SQL.Add(' CRUISE.ID=:ID ');
+     ParamByName('ID').AsInteger:=frmdm.Q.FieldByName('CRUISE_ID').Value;
+    Open;
+  end;
+
   with StatusBar1 do begin
     Panels[0].Text:='Lat: '+Floattostr(frmdm.Q.FieldByName('LATITUDE').AsFloat);
     Panels[1].Text:='Lon: '+Floattostr(frmdm.Q.FieldByName('LONGITUDE').AsFloat);
     Panels[2].Text:='Date: '+DateTimeToStr(frmdm.Q.FieldByName('DATEANDTIME').AsDateTime);
+    Panels[4].Text:='Platform: '+frmdm.Q1.FieldByName('NAME').Value;
+    Panels[3].Text:='Cruise: '+frmdm.Q1.FieldByName('CRUISE_NUMBER').Value;
   end;
+  frmdm.q1.Close;
 End;
 
 procedure Tfrmmap.btnShowAllStationsClick(Sender: TObject);
