@@ -59,13 +59,14 @@ type
     Label7: TLabel;
     lbResetSearchStations: TLabel;
     iMeteo: TMenuItem;
-    btnExportASCII: TMenuItem;
-    btnExportHDB: TMenuItem;
-    btnExportNetCDF: TMenuItem;
+    MenuItem1: TMenuItem;
+    iClose: TMenuItem;
+    MenuItem3: TMenuItem;
+    iAbout: TMenuItem;
+    MM: TMainMenu;
     Panel1: TPanel;
     pcRegion: TPageControl;
     ODir: TSelectDirectoryDialog;
-    pmExport: TPopupMenu;
     sbDatabase: TStatusBar;
     sbSelection: TStatusBar;
     OD: TOpenDialog;
@@ -86,6 +87,8 @@ type
     procedure cbCruiseDropDown(Sender: TObject);
     procedure cbProjectDropDown(Sender: TObject);
     procedure cbPlatformSelect(Sender: TObject);
+    procedure iAboutClick(Sender: TObject);
+    procedure iCloseClick(Sender: TObject);
     procedure lbResetSearchStationsClick(Sender: TObject);
     procedure btnMapClick(Sender: TObject);
     procedure btnSelectClick(Sender: TObject);
@@ -166,6 +169,7 @@ uses
   dm,
   ArbytraryRegion,
   osdensity,
+  osabout,
 
 (* data export *)
   osexport,
@@ -252,15 +256,15 @@ begin
   (* Loading TEOS-2010 dynamic library *)
   {$IFDEF WINDOWS}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.dll'));
-   // netcdf    :=LoadLibrary(PChar(GlobalPath+'netcdf.dll'));
+    netcdf    :=LoadLibrary(PChar(GlobalPath+'netcdf.dll'));
   {$ENDIF}
   {$IFDEF LINUX}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.so'));
-   // netcdf    :=LoadLibrary(PChar(GlobalPath+'libnetcdf.so'));
+    netcdf    :=LoadLibrary(PChar(GlobalPath+'libnetcdf.so'));
   {$ENDIF}
   {$IFDEF DARWIN}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.dylib'));
-   // netcdf    :=LoadLibrary(PChar(GlobalPath+'libnetcdf.dylib'));
+    netcdf    :=LoadLibrary(PChar(GlobalPath+'libnetcdf.dylib'));
   {$ENDIF}
 
 
@@ -268,10 +272,10 @@ begin
   if libgswteos=0 then libgswteos_exists:=false else libgswteos_exists:=true;
     if not libgswteos_exists then showmessage('TEOS-10 is not installed');
 
- { //netCDF loaded?
+  //netCDF loaded?
   if netcdf=0 then netcdf_exists:=false else netcdf_exists:=true;
 
-  if not netcdf_exists then showmessage('netCDF is not installed'); }
+  if not netcdf_exists then showmessage('netCDF is not installed');
 
 
   (* Define global delimiter *)
@@ -324,25 +328,26 @@ buf_str, SQL_str, QCFlag_str, cr: string;
 LatMin, LatMax, LonMin, LonMax:real;
 begin
 
-(* saving current search settings *)
+DecodeDate(dtpDateMin.Date, SSYearMin, SSMonthMin, SSDayMin);
+DecodeDate(dtpDateMax.Date, SSYearMax, SSMonthMax, SSDayMax);
+
+if dtpDateMax.Date<dtpDateMin.Date then
+    if MessageDlg('End date exceeds the beginning date',
+       mtWarning, [mbOk], 0)=mrOk then exit;
+
+if SSYearMax-SSYearMin>=10 then
+  if MessageDlg('You are about to select a large amount of data. Proceed?',
+     mtWarning, [mbYes, mbNo], 0)=mrNo then exit;
+
+try
+// frmdm.Q.DisableControls;
+
+  (* saving current search settings *)
 SaveSettingsStationSearch;
 
 frmosmain.Enabled:=false;
 btnSelect.Enabled:=false;
 Application.ProcessMessages;
-
-try
-// frmdm.Q.DisableControls;
- DecodeDate(dtpDateMin.Date, SSYearMin, SSMonthMin, SSDayMin);
- DecodeDate(dtpDateMax.Date, SSYearMax, SSMonthMax, SSDayMax);
-
-{  if chkNOTCountry.Checked   =true then NotCondCountry   :='NOT' else NotCondCountry   :='';
-  if chkNOTPlatform.Checked  =true then NotCondPlatform  :='NOT' else NotCondPlatform  :='';
-  if chkNOTSource.Checked    =true then NotCondSource    :='NOT' else NotCondSource    :='';
-  if chkNOTCruise.Checked    =true then NotCondCruise    :='NOT' else NotCondCruise    :='';
-  if chkNOTInstitute.Checked =true then NotCondInstitute :='NOT' else NotCondInstitute :='';
-  if chkNOTProject.Checked   =true then NotCondProject   :='NOT' else NotCondProject   :='';
-  }
 
   SQL_str:='';
 
@@ -1250,28 +1255,6 @@ begin
   end;
 end;
 
-procedure Tfrmosmain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-Var
-  Ini:TIniFile;
-  k: integer;
-begin
-  Ini := TIniFile.Create(IniFileName);
-   try
-    Ini.WriteInteger( 'osmain', 'top',    Top);
-    Ini.WriteInteger( 'osmain', 'left',   Left);
-    Ini.WriteInteger( 'osmain', 'width',  Width);
-    Ini.WriteInteger( 'osmain', 'weight', Height);
-   finally
-     Ini.Free;
-   end;
-
-   cbPlatform.Clear;
-   cbCountry.Clear;
-   cbSource.Clear;
-   cbInstitute.Clear;
-   cbProject.Clear;
-end;
-
 
 procedure Tfrmosmain.PopulateTblList;
 Var
@@ -1329,12 +1312,52 @@ begin
 end;
 
 
+procedure Tfrmosmain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+Var
+  Ini:TIniFile;
+  k: integer;
+begin
+  Ini := TIniFile.Create(IniFileName);
+   try
+    Ini.WriteInteger( 'osmain', 'top',    Top);
+    Ini.WriteInteger( 'osmain', 'left',   Left);
+    Ini.WriteInteger( 'osmain', 'width',  Width);
+    Ini.WriteInteger( 'osmain', 'weight', Height);
+   finally
+     Ini.Free;
+   end;
+
+   cbPlatform.Clear;
+   cbCountry.Clear;
+   cbSource.Clear;
+   cbInstitute.Clear;
+   cbProject.Clear;
+end;
+
+
+procedure Tfrmosmain.iAboutClick(Sender: TObject);
+begin
+  frmabout := Tfrmabout.Create(Self);
+   try
+    if not frmabout.ShowModal = mrOk then exit;
+   finally
+     frmabout.Free;
+     frmabout := nil;
+   end;
+end;
+
+
+procedure Tfrmosmain.iCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure Tfrmosmain.FormDestroy(Sender: TObject);
 begin
   if frmdm.DBLoader.Enabled=true then frmdm.DBLoader.Enabled:=false;
 
   FreeLibrary(libgswteos);
- // FreeLibrary(netcdf);
+  FreeLibrary(netcdf);
 
   if frmmap_open then frmmap.Close;
 end;

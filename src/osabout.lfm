@@ -1,0 +1,41 @@
+object frmabout: Tfrmabout
+  Left = 682
+  Height = 334
+  Top = 326
+  Width = 444
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'About the program'
+  ClientHeight = 334
+  ClientWidth = 444
+  DesignTimePPI = 144
+  Position = poMainFormCenter
+  LCLVersion = '2.0.6.0'
+  object Memo1: TMemo
+    Left = 10
+    Height = 314
+    Top = 10
+    Width = 424
+    Align = alClient
+    BorderSpacing.Around = 10
+    BorderStyle = bsNone
+    Color = clBtnFace
+    Lines.Strings = (
+      'OceanShell-Export v. 0.1-alpha'
+      ''
+      'The program is a GUI for the COMFORT database'
+      ''
+      'Inquiries for database access:'
+      'AlexanderA.Korablev@uib.no'
+      'AlexanderA.Korablev@gmail.com'
+      'Are.Olsen@uib.no'
+      ''
+      'Copyright (C) 2020-2021'
+      'Alexander Korablev'
+      'University of Bergen (UiB)'
+      ''
+    )
+    ReadOnly = True
+    TabOrder = 0
+  end
+end
