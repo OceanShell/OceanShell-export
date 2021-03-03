@@ -1,6 +1,0 @@
-[firebird]
-dbpath=Z:\OceanShell\databases\COMFORT_v1.FDB
-host=localhost
-port=3050
-user=SYSDBA
-pass=masterkey

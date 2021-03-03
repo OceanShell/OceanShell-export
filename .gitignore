@@ -37,7 +37,9 @@ src/lib/
 *.nc
 *.ini
 database.ini
+firebird.conf
 OceanShell
+ini/
 data/
 distrib/
 databases/
