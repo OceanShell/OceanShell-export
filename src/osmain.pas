@@ -191,8 +191,8 @@ begin
  (* Defining Global Path - application root lolder *)
   GlobalPath:=ExtractFilePath(Application.ExeName);
 
-  if Pos('.app', GlobalPath)>0 then
-   GlobalPath:=Copy(GlobalPath, 1, Pos('.app', GlobalPath)-17);
+ { if Pos('.app', GlobalPath)>0 then
+   GlobalPath:=Copy(GlobalPath, 1, Pos('.app', GlobalPath)-17);  }
 
   //showmessage(GlobalPath);
 
