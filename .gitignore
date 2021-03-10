@@ -38,7 +38,7 @@ src/lib/
 *.ini
 database.ini
 firebird.conf
-OceanShell
+OceanShellExport
 ini/
 data/
 distrib/

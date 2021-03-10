@@ -114,7 +114,7 @@ Begin
 
   DataStream := TDataStream.Create;
   DataStream.FieldTerminator := #9;
-  DataStream.LoadFromFile('00000.csv');
+  DataStream.LoadFromFile(GlobalPath+'00000.csv');
 
   SetLength(CountryData, DataStream.RecordCount);
   LastIndex := DataStream.RecordCount-1;

@@ -137,7 +137,7 @@ begin
    frmdm.TR.CommitRetaining;
 
 
-     ProgressTaskbar(raw, cnt);
+     //ProgressTaskbar(raw, cnt);
     frmdm.Q.Next;
    end;
  finally

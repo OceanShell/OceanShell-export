@@ -67,6 +67,7 @@ type
     Panel1: TPanel;
     pcRegion: TPageControl;
     ODir: TSelectDirectoryDialog;
+    ProgressBar1: TProgressBar;
     sbDatabase: TStatusBar;
     sbSelection: TStatusBar;
     OD: TOpenDialog;
@@ -190,6 +191,11 @@ begin
  (* Defining Global Path - application root lolder *)
   GlobalPath:=ExtractFilePath(Application.ExeName);
 
+  if Pos('.app', GlobalPath)>0 then
+   GlobalPath:=Copy(GlobalPath, 1, Pos('.app', GlobalPath)-17);
+
+  //showmessage(GlobalPath);
+
   if not FileExists(GlobalPath+'database.ini') then
     if MessageDlg('Please, put database.ini next to the program',
        mtWarning, [mbOk], 0)=MrOk then exit;
@@ -252,6 +258,13 @@ begin
     Ini.WriteInteger('main', 'Language', 0);
     Ini.Free;
   end;
+
+
+  {$IFDEF UNIX}
+    progressbar1.Visible:=true;
+  {$ELSE}
+    progressbar1.Visible:=false;
+  {$ENDIF}
 
   (* Loading TEOS-2010 dynamic library *)
   {$IFDEF WINDOWS}
@@ -319,6 +332,9 @@ procedure Tfrmosmain.btnSelectClick(Sender: TObject);
 var
 i, k, fl:integer;
 SSYearMin,SSYearMax,SSMonthMin,SSMonthMax,SSDayMin,SSDayMax :Word;
+SSHourMin, SSMinMin, SSSecMin, SSMSecMin: word;
+SSHourMax, SSMinMax, SSSecMax, SSMSecMax: word;
+
 NotCondCountry, NotCondPlatform, NotCondSource, NotCondCruise:string;
 NotCondInstitute, NotCondProject, NotCondOrigin, SBordersFile:string;
 
@@ -328,8 +344,8 @@ buf_str, SQL_str, QCFlag_str, cr: string;
 LatMin, LatMax, LonMin, LonMax:real;
 begin
 
-DecodeDate(dtpDateMin.Date, SSYearMin, SSMonthMin, SSDayMin);
-DecodeDate(dtpDateMax.Date, SSYearMax, SSMonthMax, SSDayMax);
+DecodeDateTime(dtpDateMin.Date, SSYearMin, SSMonthMin, SSDayMin, SSHourMin, SSMinMin, SSSecMin, SSMSecMin);
+DecodeDateTime(dtpDateMax.Date, SSYearMax, SSMonthMax, SSDayMax, SSHourMax, SSMinMax, SSSecMax, SSMSecMax);
 
 if dtpDateMax.Date<dtpDateMin.Date then
     if MessageDlg('End date exceeds the beginning date',
@@ -369,13 +385,14 @@ Application.ProcessMessages;
     end;
 
 
+ // showmessage(DateTimeToStr(dtpDateMin.DateTime)+ DateTimeToStr(dtpDateMax.DateTime));
     (* Date and Time *)
     // From date to date
   //  if (dtpDateMin.DateTime<>MinDate) or (dtpDateMax.DateTime<>MaxDate) then begin
       if chkPeriod.Checked=false then begin
        SQL_str:=SQL_str+' AND (DATEANDTIME BETWEEN '+
-                        QuotedStr(DateTimeToStr(dtpDateMin.DateTime))+' AND '+
-                        QuotedStr(DateTimeToStr(dtpDateMax.DateTime))+') ';
+                        QuotedStr(FormatDateTime('DD.MM.YYYY hh:nn:ss',dtpDateMin.DateTime))+' AND '+
+                        QuotedStr(FormatDateTime('DD.MM.YYYY hh:nn:ss',dtpDateMax.DateTime))+') ';
       end;
 
      //Date in Period
