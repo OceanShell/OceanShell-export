@@ -194,7 +194,7 @@ begin
  { if Pos('.app', GlobalPath)>0 then
    GlobalPath:=Copy(GlobalPath, 1, Pos('.app', GlobalPath)-17);  }
 
-  //showmessage(GlobalPath);
+  showmessage(GlobalPath);
 
   if not FileExists(GlobalPath+'database.ini') then
     if MessageDlg('Please, put database.ini next to the program',
@@ -217,7 +217,7 @@ begin
       LibraryName:=GlobalPath+'fbclient.dll';
     {$ENDIF}
     {$IFDEF LINUX}
-      LibraryName:=GlobalPath+'libfbclient.so.3.0.5';
+      LibraryName:='libfbclient.so';
     {$ENDIF}
     {$IFDEF DARWIN}
       LibraryName:=GlobalPath+'libfbclient.dylib';
@@ -273,7 +273,7 @@ begin
   {$ENDIF}
   {$IFDEF LINUX}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.so'));
-    netcdf    :=LoadLibrary(PChar(GlobalPath+'libnetcdf.so'));
+    netcdf    :=LoadLibrary(PChar('libnetcdf.so'));
   {$ENDIF}
   {$IFDEF DARWIN}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.dylib'));
