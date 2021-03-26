@@ -29,12 +29,12 @@ DAR=Array of Array of double; //dynmic array of real
 Var
 DSt: DAR;
 i,j,kt,var_count,stations_count,index :integer;
-platform_id,station_id,cruise_id,source_id :integer;
+platform_id,station_id,cruise_id,source_id,country_id :integer;
 cnt,units_def,units_id,bd,stver,cast,instrument :integer;
 tn,prfn :integer;
 lat,lon,val,val_conv,lev_dbar,lev_m,DF: real;
 fn,tbl :string;
-cruise_number,PI_name,stno,str,units_sname,source_name,platform_name :string;
+cruise_number,PI_name,stno,str,units_sname,source_name,platform_name,country_name :string;
 dt :TDateTime;
 st_with_data,ipd_exist,isconverted: boolean;
 fo: text;
@@ -117,11 +117,22 @@ writeln(fo,'# ');
     with frmdm.q2 do begin
       Close;
       SQL.Clear;
-      SQL.Add(' select name from PLATFORM ');
+      SQL.Add(' select name, country_id from PLATFORM ');
       SQL.Add(' where id=:platform_id ');
       ParamByName('platform_id').AsInteger:=platform_id;
       Open;
       platform_name:=FieldByName('name').AsString;
+      country_id:=FieldByName('country_id').AsInteger;
+      Close;
+    end;
+    with frmdm.q2 do begin
+      Close;
+      SQL.Clear;
+      SQL.Add(' select name from COUNTRY ');
+      SQL.Add(' where id=:country_id ');
+      ParamByName('country_id').AsInteger:=country_id;
+      Open;
+      country_name:=FieldByName('name').AsString;
       Close;
     end;
     with frmdm.q2 do begin
@@ -262,7 +273,7 @@ writeln(fo,'# ');
         val_conv:=DF;
         //if frmexport.grConversion.ItemIndex=1 then
         if conv=0 then
-        getdefaultunits(tbl,units_id,units_def,val,1.025,val_conv,isconverted);
+        getdefaultunits(tbl,units_id,units_def,val,val_conv,isconverted);
         //if frmexport.grConversion.ItemIndex=1 then
         if conv=1 then
         GetDefaultUnitsExact(tbl,units_id,units_def,station_id,instrument,prfn,
@@ -317,6 +328,8 @@ writeln(fo,inttostr(station_id)+#9+'(station_id)');
 writeln(fo,inttostr(cruise_id)+#9+'(cruise_id)');
 writeln(fo,inttostr(source_id)+#9+'(source_id)');
 writeln(fo,source_name+#9+'(source_name)');
+writeln(fo,inttostr(country_id)+#9+'(country_id)');
+writeln(fo,country_name+#9+'(country_name)');
 writeln(fo,inttostr(platform_id)+#9+'(platform_id)');
 writeln(fo,platform_name+#9+'(platform_name)');
 writeln(fo,cruise_number+#9+'(cruise_number)');
@@ -329,7 +342,7 @@ writeln(fo,stno+#9+'(st_number_origin)');
 writeln(fo,inttostr(stver)+#9+'(station version)');
 writeln(fo,inttostr(cast)+#9+'(cast number)');
 writeln(fo,inttostr(var_count)+#9+'(number of variables at station)');
-writeln(fo,inttostr(High(DSt))+#9+'(number of records at station)');
+writeln(fo,inttostr(Length(DSt))+#9+'(number of records at station)');
 writeln(fo,str);
 end
 else begin
@@ -337,6 +350,8 @@ writeln(fo,inttostr(station_id));
 writeln(fo,inttostr(cruise_id));
 writeln(fo,inttostr(source_id));
 writeln(fo,source_name);
+writeln(fo,inttostr(country_id));
+writeln(fo,country_name);
 writeln(fo,inttostr(platform_id));
 writeln(fo,platform_name);
 writeln(fo,cruise_number);
@@ -349,7 +364,7 @@ writeln(fo,stno);
 writeln(fo,inttostr(stver));
 writeln(fo,inttostr(cast));
 writeln(fo,inttostr(var_count));
-writeln(fo,inttostr(High(DSt)));
+writeln(fo,inttostr(Length(DSt)));
 writeln(fo,str);
 end;
 
