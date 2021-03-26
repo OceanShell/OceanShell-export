@@ -59,7 +59,10 @@ begin
 
    tbl_count:=0;
    for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do
-     if frmexport.CheckGroup1.Checked[kt] then inc(tbl_count);
+     if frmexport.CheckGroup1.Checked[kt] then begin
+      inc(tbl_count);
+      //showmessage(frmexport.CheckGroup1.Items.Strings[kt]);
+     end;
 
    if tbl_count=0 then begin
       showmessage('Variable is not selected!');

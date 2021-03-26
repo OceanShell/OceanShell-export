@@ -1,21 +1,20 @@
 object frmexport: Tfrmexport
   Left = 405
-  Height = 595
+  Height = 429
   Top = 210
-  Width = 1098
+  Width = 752
   BorderStyle = bsSingle
   Caption = 'Selection'
-  ClientHeight = 595
-  ClientWidth = 1098
-  DesignTimePPI = 144
+  ClientHeight = 429
+  ClientWidth = 752
   OnShow = FormShow
   Position = poOwnerFormCenter
-  LCLVersion = '2.0.6.0'
+  LCLVersion = '2.0.8.0'
   object CheckGroup1: TCheckGroup
-    Left = 24
-    Height = 528
-    Top = 16
-    Width = 787
+    Left = 16
+    Height = 386
+    Top = 11
+    Width = 525
     AutoFill = True
     Caption = 'Variable(s)'
     ChildSizing.LeftRightSpacing = 6
@@ -31,10 +30,10 @@ object frmexport: Tfrmexport
     TabOrder = 0
   end
   object rgFormat: TRadioGroup
-    Left = 832
-    Height = 150
-    Top = 16
-    Width = 246
+    Left = 555
+    Height = 100
+    Top = 11
+    Width = 181
     AutoFill = True
     Caption = 'Format'
     ChildSizing.LeftRightSpacing = 6
@@ -44,8 +43,8 @@ object frmexport: Tfrmexport
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
-    ClientHeight = 120
-    ClientWidth = 242
+    ClientHeight = 83
+    ClientWidth = 179
     ItemIndex = 0
     Items.Strings = (
       'Text (variables)'
@@ -56,10 +55,10 @@ object frmexport: Tfrmexport
     TabOrder = 1
   end
   object btnExport: TButton
-    Left = 832
-    Height = 38
-    Top = 264
-    Width = 246
+    Left = 555
+    Height = 25
+    Top = 208
+    Width = 181
     Caption = 'Start export'
     OnClick = btnExportClick
     ParentFont = False
@@ -67,10 +66,10 @@ object frmexport: Tfrmexport
   end
   object btnSelectAll: TLabel
     Cursor = crHandPoint
-    Left = 24
-    Height = 25
-    Top = 552
-    Width = 71
+    Left = 16
+    Height = 14
+    Top = 400
+    Width = 56
     Caption = 'Select All'
     Font.Color = clNavy
     Font.Style = [fsUnderline]
@@ -79,20 +78,19 @@ object frmexport: Tfrmexport
     OnClick = btnSelectAllClick
   end
   object Memo1: TMemo
-    Left = 832
-    Height = 224
-    Top = 320
-    Width = 246
+    Left = 555
+    Height = 149
+    Top = 248
+    Width = 181
     BorderStyle = bsNone
-    Color = clBtnFace
     ParentFont = False
     TabOrder = 3
   end
   object grConversion: TRadioGroup
-    Left = 832
-    Height = 80
-    Top = 168
-    Width = 246
+    Left = 555
+    Height = 77
+    Top = 120
+    Width = 181
     AutoFill = True
     Caption = 'Density for units conversion'
     ChildSizing.LeftRightSpacing = 6
@@ -101,10 +99,9 @@ object frmexport: Tfrmexport
     ChildSizing.ShrinkHorizontal = crsScaleChilds
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 2
-    ClientHeight = 50
-    ClientWidth = 242
-    Columns = 2
+    ChildSizing.ControlsPerLine = 1
+    ClientHeight = 60
+    ClientWidth = 179
     ItemIndex = 0
     Items.Strings = (
       'Constant'
