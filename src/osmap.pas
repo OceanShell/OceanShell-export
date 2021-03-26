@@ -67,16 +67,19 @@ begin
   MainGlobe.Marker.Lon := frmdm.Q.FieldByName('LONGITUDE').AsFloat;
 
   MainGlobe.CheckSettings;
+  ChangeID(frmdm.Q.FieldByName('ID').Value);
 end;
 
 procedure Tfrmmap.ChangeID(ID:integer);
+Var
+  Cr_str:string;
 begin
   MainGlobe.ChangeID(ID);
 
   with frmdm.q1 do begin
     Close;
      SQL.Clear;
-     SQL.Add(' SELECT PLATFORM.NAME, CRUISE_NUMBER ');
+     SQL.Add(' SELECT PLATFORM.NAME, CRUISE.CRUISE_NUMBER ');
      SQL.Add(' FROM CRUISE, PLATFORM WHERE ');
      SQL.Add(' CRUISE.PLATFORM_ID=PLATFORM.ID AND ');
      SQL.Add(' CRUISE.ID=:ID ');
@@ -84,12 +87,16 @@ begin
     Open;
   end;
 
+  if frmdm.Q1.FieldByName('CRUISE_NUMBER').AsString<>'' then
+     Cr_str:='Cruise name: '+frmdm.Q1.FieldByName('CRUISE_NUMBER').AsString else
+     Cr_str:='Cruise ID: '+IntToStr(frmdm.Q.FieldByName('CRUISE_ID').Value);
+
   with StatusBar1 do begin
-    Panels[0].Text:='Lat: '+Floattostr(frmdm.Q.FieldByName('LATITUDE').AsFloat);
-    Panels[1].Text:='Lon: '+Floattostr(frmdm.Q.FieldByName('LONGITUDE').AsFloat);
-    Panels[2].Text:='Date: '+DateTimeToStr(frmdm.Q.FieldByName('DATEANDTIME').AsDateTime);
-    Panels[4].Text:='Platform: '+frmdm.Q1.FieldByName('NAME').Value;
-    Panels[3].Text:='Cruise: '+frmdm.Q1.FieldByName('CRUISE_NUMBER').Value;
+    Panels[0].Text:='Lat: '+Floattostr(frmdm.Q.FieldByName('LATITUDE').AsFloat)+'; '+
+                    'Lon: '+Floattostr(frmdm.Q.FieldByName('LONGITUDE').AsFloat)+'; '+
+                    'Date: '+FormatDateTime('DD.MM.YYYY hh:nn:ss', frmdm.Q.FieldByName('DATEANDTIME').AsDateTime)+'; '+
+                    'Platform: '+frmdm.Q1.FieldByName('NAME').AsString+'; '+
+                    cr_str;
   end;
   frmdm.q1.Close;
 End;

@@ -1,21 +1,20 @@
 object frmmap: Tfrmmap
   Left = 492
-  Height = 586
+  Height = 391
   Top = 205
-  Width = 1000
+  Width = 667
   Caption = 'Map'
-  ClientHeight = 586
-  ClientWidth = 1000
-  DesignTimePPI = 144
+  ClientHeight = 391
+  ClientWidth = 667
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.0.6.0'
+  LCLVersion = '2.0.8.0'
   object ToolBar1: TToolBar
-    Left = 960
-    Height = 550
+    Left = 640
+    Height = 374
     Top = 0
-    Width = 40
+    Width = 27
     Align = alRight
     Caption = 'ToolBar1'
     EdgeBorders = [ebLeft]
@@ -27,28 +26,28 @@ object frmmap: Tfrmmap
     object btnZoomIn: TToolButton
       Left = 3
       Hint = 'Zoom In'
-      Top = 71
+      Top = 47
       ImageIndex = 998
       OnClick = btnZoomInClick
     end
     object btnZoomOut: TToolButton
       Left = 3
       Hint = 'Zoom Out'
-      Top = 104
+      Top = 69
       ImageIndex = 999
       OnClick = btnZoomOutClick
     end
     object ToolButton2: TToolButton
       Left = 3
-      Top = 137
-      Width = 35
+      Top = 91
+      Width = 23
       Caption = 'ToolButton2'
       Style = tbsDivider
     end
     object btnShowSelected: TToolButton
       Left = 3
       Hint = 'Center at selected station'
-      Top = 33
+      Top = 22
       Caption = 'btnShowSelected'
       ImageIndex = 1001
       OnClick = btnShowSelectedClick
@@ -63,22 +62,22 @@ object frmmap: Tfrmmap
     end
     object ToolButton3: TToolButton
       Left = 3
-      Top = 66
-      Width = 35
+      Top = 44
+      Width = 23
       Caption = 'ToolButton3'
       Style = tbsDivider
     end
     object ToolButton1: TToolButton
       Left = 3
-      Top = 175
-      Width = 35
+      Top = 116
+      Width = 23
       Caption = 'ToolButton1'
       Style = tbsDivider
     end
     object btnSettings: TToolButton
       Left = 3
       Hint = 'Map settings'
-      Top = 180
+      Top = 119
       Caption = 'btnSettings'
       ImageIndex = 235
       OnClick = btnSettingsClick
@@ -86,7 +85,7 @@ object frmmap: Tfrmmap
     object btnSaveMapAs: TToolButton
       Left = 3
       Hint = 'Save map as picture'
-      Top = 142
+      Top = 94
       Caption = 'Save as...'
       ImageIndex = 713
       OnClick = btnSaveMapAsClick
@@ -94,35 +93,26 @@ object frmmap: Tfrmmap
   end
   object pmap: TPanel
     Left = 0
-    Height = 550
+    Height = 374
     Top = 0
-    Width = 960
+    Width = 640
     Align = alClient
     BevelOuter = bvNone
     Caption = 'pmap'
+    ParentFont = False
     TabOrder = 1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 36
-    Top = 550
-    Width = 1000
+    Height = 17
+    Top = 374
+    Width = 667
     Panels = <    
       item
-        Width = 130
-      end    
-      item
-        Width = 150
-      end    
-      item
-        Width = 230
-      end    
-      item
-        Width = 250
-      end    
-      item
-        Width = 200
+        Width = 50
       end>
+    ParentFont = False
     SimplePanel = False
+    SizeGrip = False
   end
 end

@@ -205,7 +205,7 @@ Begin
    Color_Pointer_Inner  :=StringToColor(Ini.ReadString( 'osmap', 'pointer_inner_color',   'clRed'));
    Color_Pointer_Border :=StringToColor(Ini.ReadString( 'osmap', 'pointer_border_color',  'clBlack'));
 
-   Color_Selection_Cross:=StringToColor(Ini.ReadString( 'osmap', 'selection_cross_color', 'clRed'));
+   Color_Selection_Cross:=StringToColor(Ini.ReadString( 'osmap', 'selection_cross_color', 'clYellow'));
    Color_Map_Background :=StringToColor(Ini.ReadString( 'osmap', 'map_background_color',  'clNavy'));
    Color_Globe_Disc     :=StringToColor(Ini.ReadString( 'osmap', 'globe_disc_color',      'clAqua'));
    Color_Land           :=StringToColor(Ini.ReadString( 'osmap', 'land_color',            '$00D000')); //Light Green

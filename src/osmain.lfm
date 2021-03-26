@@ -250,10 +250,10 @@ object frmosmain: Tfrmosmain
         Font.Name = 'MS Sans Serif'
         ParentFont = False
         object cbPredefinedRegion: TComboBox
-          Left = 16
+          Left = 24
           Height = 27
           Top = 32
-          Width = 240
+          Width = 296
           Font.Color = clWindowText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
@@ -621,6 +621,7 @@ object frmosmain: Tfrmosmain
     left = 360
   end
   object ODir: TSelectDirectoryDialog
+    Options = [ofCreatePrompt, ofEnableSizing, ofViewDetail]
     left = 283
   end
   object MM: TMainMenu

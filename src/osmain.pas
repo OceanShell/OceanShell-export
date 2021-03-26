@@ -194,7 +194,7 @@ begin
  { if Pos('.app', GlobalPath)>0 then
    GlobalPath:=Copy(GlobalPath, 1, Pos('.app', GlobalPath)-17);  }
 
-  showmessage(GlobalPath);
+ // showmessage(GlobalPath);
 
   if not FileExists(GlobalPath+'database.ini') then
     if MessageDlg('Please, put database.ini next to the program',
@@ -553,6 +553,8 @@ Application.ProcessMessages;
 
    SelectionInfo;
    CDSNavigation;
+
+   if MessageDlg('Selected stations: '+inttostr(frmdm.Q.RecordCount), mtInformation, [mbOk], 0)=mrOk then exit;
 
 finally
   frmosmain.Enabled:=true;
