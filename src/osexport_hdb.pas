@@ -151,7 +151,7 @@ writeln(fo,'# ');
     str:='[dbar]'+#9+'[m]'+#9+'inst'+#9+'prfn';
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
-    tbl:=frmexport.CheckGroup1.Items.Strings[kt];
+    tbl:='P_'+frmexport.CheckGroup1.Items.Strings[kt];
 
  {...variables at the station}
     st_with_data:=false;
@@ -204,7 +204,7 @@ writeln(fo,'# ');
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
 
-     tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
+     tbl:='P_'+frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
      //frmexport.Memo1.lines.Add(tbl);
 
      {...variables at the station}
@@ -388,6 +388,7 @@ end;
 
 finally
     frmdm.Q.EnableControls;
+     ProgressTaskbar(0, 0);
 {try}end;
 
 end;

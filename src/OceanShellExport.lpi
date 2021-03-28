@@ -148,6 +148,7 @@
         <Filename Value="osabout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmabout"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit20>
     </Units>

@@ -1328,8 +1328,10 @@ begin
       end;
      end;
 
-     for k:=0 to TempListPar.Count-1 do
-      ListBox1.Items.Add(TempListPar.Items.Strings[k]);
+     for k:=0 to TempListPar.Count-1 do begin
+      tbl:=TempListPar.Items.Strings[k];
+      ListBox1.Items.Add(copy(tbl, 3, length(tbl)));
+     end;
 
     finally
       TempListAll.Free;

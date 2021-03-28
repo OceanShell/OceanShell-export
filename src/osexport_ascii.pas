@@ -64,7 +64,7 @@ try
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
 
-   tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
+   tbl:='P_'+frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
 
    {...default unit values to be converted}
    with frmdm.q1 do begin
