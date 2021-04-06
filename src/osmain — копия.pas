@@ -36,6 +36,7 @@ type
     btnExport: TBitBtn;
     btnMap: TBitBtn;
     btnSelect: TBitBtn;
+    btnDensity: TButton;
     cbInstitute: TComboBox;
     cbCruise: TComboBox;
     cbProject: TComboBox;
@@ -46,10 +47,6 @@ type
     cbSource: TComboBox;
     dtpDateMax: TDateTimePicker;
     dtpDateMin: TDateTimePicker;
-    eLonMax: TEdit;
-    eLonMin: TEdit;
-    eLatMin: TEdit;
-    eLatMax: TEdit;
     gbAuxiliaryParameters: TGroupBox;
     gbDateandTime: TGroupBox;
     gbRegion: TGroupBox;
@@ -76,10 +73,13 @@ type
     OD: TOpenDialog;
     SD: TSaveDialog;
     ListBox1: TListBox;
+    seLatMax: TFloatSpinEdit;
+    seLatMin: TFloatSpinEdit;
+    seLonMax: TFloatSpinEdit;
+    seLonMin: TFloatSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet3: TTabSheet;
 
-    procedure eLatMaxKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
 
@@ -186,23 +186,22 @@ procedure Tfrmosmain.FormCreate(Sender: TObject);
 Var
   Ini: TIniFile;
   server, DBPath, DBHost, DBUser, DBPass:string;
+  DBSettingsPath: string;
 begin
 
  (* Defining Global Path - application root lolder *)
   GlobalPath:=ExtractFilePath(Application.ExeName);
+  DBSettingsPath:=Copy(GlobalPath, 1, Pos('OceanShellExport', GlobalPath)-1);
 
- { if Pos('.app', GlobalPath)>0 then
-   GlobalPath:=Copy(GlobalPath, 1, Pos('.app', GlobalPath)-17);  }
+//  showmessage(GlobalPath+'   '+DBSettingsPath);
 
- // showmessage(GlobalPath);
-
-  if not FileExists(GlobalPath+'database.ini') then
+  if not FileExists(DBSettingsPath+'database.ini') then
     if MessageDlg('Please, put database.ini next to the program',
        mtWarning, [mbOk], 0)=MrOk then exit;
 
   server:='firebird';
 
-  Ini := TIniFile.Create(GlobalPath+'database.ini');
+  Ini := TIniFile.Create(DBSettingsPath+'database.ini');
   try
     DBUser :=Ini.ReadString(server, 'user',     'SYSDBA');
     DBPass :=Ini.ReadString(server, 'pass',     'masterkey');
@@ -217,7 +216,7 @@ begin
       LibraryName:=GlobalPath+'fbclient.dll';
     {$ENDIF}
     {$IFDEF LINUX}
-      LibraryName:='libfbclient.so';
+      LibraryName:=GlobalPath+'libfbclient.so.3.0.5';
     {$ENDIF}
     {$IFDEF DARWIN}
       LibraryName:=GlobalPath+'libfbclient.dylib';
@@ -241,11 +240,6 @@ begin
     on e: Exception do
       if MessageDlg(e.message, mtError, [mbOk], 0)=mrOk then close;
   end;
-end;
-
-procedure Tfrmosmain.eLatMaxKeyPress(Sender: TObject; var Key: char);
-begin
-  if not (Key in [#45, #8, '0'..'9', DefaultFormatSettings.DecimalSeparator]) then Key:=#0;
 end;
 
 procedure Tfrmosmain.FormShow(Sender: TObject);
@@ -278,7 +272,7 @@ begin
   {$ENDIF}
   {$IFDEF LINUX}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.so'));
-    netcdf    :=LoadLibrary(PChar('libnetcdf.so'));
+    netcdf    :=LoadLibrary(PChar(GlobalPath+'libnetcdf.so'));
   {$ENDIF}
   {$IFDEF DARWIN}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.dylib'));
@@ -310,10 +304,10 @@ begin
 
     (* STATION search settings *)
     pcRegion.ActivePageIndex:=Ini.ReadInteger( 'osmain', 'station_region_pcRegion', 0);
-    eLatMin.Text  :=Ini.ReadString  ( 'osmain', 'station_latmin',     '0');
-    eLatMax.Text  :=Ini.ReadString  ( 'osmain', 'station_latmax',     '0');
-    eLonMin.Text  :=Ini.ReadString  ( 'osmain', 'station_lonmin',     '0');
-    eLonMax.Text  :=Ini.ReadString  ( 'osmain', 'station_lonmax',     '0');
+    seLatMin.Value   :=Ini.ReadFloat  ( 'osmain', 'station_latmin',     0);
+    seLatMax.Value   :=Ini.ReadFloat  ( 'osmain', 'station_latmax',     0);
+    seLonMin.Value   :=Ini.ReadFloat  ( 'osmain', 'station_lonmin',     0);
+    seLonMax.Value   :=Ini.ReadFloat  ( 'osmain', 'station_lonmax',     0);
     chkPeriod.Checked:=Ini.ReadBool   ( 'osmain', 'station_period', false);
     cbPlatform.Text  :=Ini.ReadString ( 'osmain', 'station_platform',  '');
     cbCountry.Text   :=Ini.ReadString ( 'osmain', 'station_country',   '');
@@ -330,11 +324,6 @@ begin
   if cbCruise.Text<>'' then cbCruise.Enabled:=true;
 
   DatabaseInfo;
-end;
-
-procedure Tfrmosmain.btnDensityClick(Sender: TObject);
-begin
-
 end;
 
 
@@ -381,17 +370,17 @@ Application.ProcessMessages;
   SQL_str:=SQL_str+' AND (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) ';
 
   if pcRegion.ActivePageIndex=0 then begin
-    SQL_str:=SQL_str+' AND (LATITUDE BETWEEN '+eLatMin.Text+
-                     ' AND '+eLatMax.Text+') ';
+    SQL_str:=SQL_str+' AND (LATITUDE BETWEEN '+seLatMin.Text+
+                     ' AND '+seLatMax.Text+') ';
 
-     if StrToFloat(eLonMax.Text)>=StrToFloat(eLonMin.Text) then
-       SQL_str:=SQL_str+' AND (LONGITUDE BETWEEN '+eLonMin.Text+
-                        ' AND '+eLonMax.Text+') ';
+     if seLonMax.Value>=seLonMin.Value then
+       SQL_str:=SQL_str+' AND (LONGITUDE BETWEEN '+seLonMin.Text+
+                        ' AND '+seLonMax.Text+') ';
 
-     if StrToFloat(eLonMax.Text)<StrToFloat(eLonMin.Text) then
-      SQL_str:=SQL_str+' AND ((LONGITUDE>='+eLonMin.Text+
+     if seLonMax.Value<seLonMin.Value then
+      SQL_str:=SQL_str+' AND ((LONGITUDE>='+seLonMin.Text+
                        ' AND LONGITUDE<=180) OR '+
-                       '(LONGITUDE>=-180 and LONGITUDE<='+eLonMax.Text+')) ';
+                       '(LONGITUDE>=-180 and LONGITUDE<='+seLonMax.Text+')) ';
     end;
 
 
@@ -564,8 +553,6 @@ Application.ProcessMessages;
    SelectionInfo;
    CDSNavigation;
 
-   if MessageDlg('Selected stations: '+inttostr(frmdm.Q.RecordCount), mtInformation, [mbOk], 0)=mrOk then exit;
-
 finally
   frmosmain.Enabled:=true;
   btnSelect.Enabled:=true;
@@ -580,10 +567,10 @@ begin
 
   cbPredefinedRegion.Items.Clear;
 
-  eLatMin.Text:=FloatToStr(StationLatMin);
-  eLatMax.Text:=FloatToStr(StationLatMax);
-  eLonMin.Text:=FloatToStr(StationLonMin);
-  eLonMax.Text:=FloatToStr(StationLonMax);
+  seLatMin.Value:=StationLatMin;
+  seLatMax.Value:=StationLatMax;
+  seLonMin.Value:=StationLonMin;
+  seLonMax.Value:=StationLonMax;
 
   cbPlatform.Clear;
   cbCountry.Clear;
@@ -653,11 +640,11 @@ Qt_DB1.Transaction:=TRt_DB1;
          Panels[7].Text:='Stations: '+inttostr(StationCount);
        end;
 
-       if (elatmin.Text='0') and (elatmax.Text='0') then begin
-           eLatMin.Text:=FloatToStr(StationLatMin);
-           eLatMax.Text:=FloatToStr(StationLatMax);
-           eLonMin.Text:=FloatToStr(StationLonMin);
-           eLonMax.Text:=FloatToStr(StationLonMax);
+       if (selatmin.Value=0) and (selatmax.Value=0) then begin
+           seLatMin.Value:=StationLatMin;
+           seLatMax.Value:=StationLatMax;
+           seLonMin.Value:=StationLonMin;
+           seLonMax.Value:=StationLonMax;
 
            dtpDateMin.Date:=StationDateMin;
            dtpDateMax.Date:=StationDateMax;
@@ -1258,6 +1245,11 @@ begin
    end;
 end;
 
+procedure Tfrmosmain.btnDensityClick(Sender: TObject);
+begin
+  PopulateDensityTbl;
+end;
+
 
 (* Saving STATION search settings *)
 procedure Tfrmosmain.SaveSettingsStationSearch;
@@ -1267,10 +1259,10 @@ begin
   Ini := TIniFile.Create(IniFileName);
   try
     Ini.WriteInteger ( 'osmain', 'station_region_pcRegion', pcRegion.ActivePageIndex);
-    Ini.WriteString  ( 'osmain', 'station_latmin',   eLatMin.Text);
-    Ini.WriteString  ( 'osmain', 'station_latmax',   eLatMax.Text);
-    Ini.WriteString  ( 'osmain', 'station_lonmin',   eLonMin.Text);
-    Ini.WriteString  ( 'osmain', 'station_lonmax',   eLonMax.Text);
+    Ini.WriteFloat   ( 'osmain', 'station_latmin',   seLatMin.Value);
+    Ini.WriteFloat   ( 'osmain', 'station_latmax',   seLatMax.Value);
+    Ini.WriteFloat   ( 'osmain', 'station_lonmin',   seLonMin.Value);
+    Ini.WriteFloat   ( 'osmain', 'station_lonmax',   seLonMax.Value);
     Ini.WriteString  ( 'osmain', 'station_platform', cbPlatform.Text);
     Ini.WriteString  ( 'osmain', 'station_country',  cbCountry.Text);
     Ini.WriteString  ( 'osmain', 'station_source',   cbSource.Text);
@@ -1333,10 +1325,8 @@ begin
       end;
      end;
 
-     for k:=0 to TempListPar.Count-1 do begin
-      tbl:=TempListPar.Items.Strings[k];
-      ListBox1.Items.Add(copy(tbl, 3, length(tbl)));
-     end;
+     for k:=0 to TempListPar.Count-1 do
+      ListBox1.Items.Add(TempListPar.Items.Strings[k]);
 
     finally
       TempListAll.Free;

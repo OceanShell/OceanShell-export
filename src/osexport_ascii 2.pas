@@ -64,7 +64,7 @@ try
 {T}for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do begin
 {C}if frmexport.CheckGroup1.Checked[kt] then begin
 
-   tbl:='P_'+frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
+   tbl:=frmexport.CheckGroup1.Items.Strings[kt]; {selected table}
 
    {...default unit values to be converted}
    with frmdm.q1 do begin
@@ -162,7 +162,7 @@ try
         writeln(md,inttostr(ID), #9,
                    floattostr(Lat), #9,
                    floattostr(lon), #9,
-                   datetimetostr(date1), #9,
+                   FormatDateTime('DD.MM.YYYY hh:nn:ss', date1), #9,
                    inttostr(depth), #9,
                    StNum, #9,
                    inttostr(ver), #9,
@@ -199,8 +199,6 @@ try
 
    while not frmdm.q1.EOF do begin
 
-   if cancel_fl=true then break;
-
    WQF:=9;
    val_conv:=-9999;
 
@@ -217,7 +215,7 @@ try
    best:=frmdm.q1.FieldByName('profile_best').Value;
 
    if not VarIsNull(frmdm.q1.FieldByName('bottle_number').Value) then
-     btl_num:=frmdm.q1.FieldByName('bottle_number').Value else btl_num:=-9;
+     btl_num:=frmdm.q1.FieldByName('bottle_number').Value else btl_num:=-9999;
 
    if (tbl='P_HE') or (tbl='P_C14') or (tbl='P_HE3') or (tbl='P_NEON') then
    valerr:=frmdm.q1.FieldByName('valerr').AsFloat;
@@ -283,12 +281,11 @@ try
   end;
 {PQF2}end;
 
-   if cancel_fl=true then break;
    frmdm.q1.Next;
 {S}end;
 
-   //Application.ProcessMessages;
-   if cancel_fl=true then break;
+
+
   frmdm.Q.Next;
 {STEP}end;
   closefile(fo);
@@ -300,13 +297,12 @@ try
   if trim(st)='' then DeleteFile(fn);
 
    first_tbl:=false;
-   if cancel_fl=true then break;
   // exit;
 {C}end; {table is checked }
 
    procedures.ProgressTaskbar(kt, frmexport.CheckGroup1.Items.Count-1);
-  // Application.ProcessMessages;
-   if cancel_fl=true then break;
+
+
 {T}end; {tables cycle}
 finally
   closefile(md);

@@ -27,6 +27,7 @@ object frmexport: Tfrmexport
     ChildSizing.ControlsPerLine = 1
     ColumnLayout = clVerticalThenHorizontal
     Columns = 3
+    OnClick = CheckGroup1Click
     ParentFont = False
     TabOrder = 0
   end
@@ -44,8 +45,8 @@ object frmexport: Tfrmexport
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
-    ClientHeight = 83
-    ClientWidth = 179
+    ClientHeight = 81
+    ClientWidth = 171
     ItemIndex = 0
     Items.Strings = (
       'Text (variables)'
@@ -59,8 +60,9 @@ object frmexport: Tfrmexport
     Left = 555
     Height = 25
     Top = 208
-    Width = 181
+    Width = 117
     Caption = 'Start export'
+    Enabled = False
     OnClick = btnExportClick
     ParentFont = False
     TabOrder = 2
@@ -68,9 +70,9 @@ object frmexport: Tfrmexport
   object btnSelectAll: TLabel
     Cursor = crHandPoint
     Left = 16
-    Height = 14
+    Height = 16
     Top = 400
-    Width = 56
+    Width = 57
     Caption = 'Select All'
     Font.Color = clNavy
     Font.Style = [fsUnderline]
@@ -84,6 +86,7 @@ object frmexport: Tfrmexport
     Top = 248
     Width = 181
     BorderStyle = bsNone
+    Lines.Strings = (    )
     ParentFont = False
     TabOrder = 3
   end
@@ -101,8 +104,8 @@ object frmexport: Tfrmexport
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 1
-    ClientHeight = 60
-    ClientWidth = 179
+    ClientHeight = 58
+    ClientWidth = 171
     ItemIndex = 0
     Items.Strings = (
       'Constant'
@@ -110,5 +113,19 @@ object frmexport: Tfrmexport
     )
     ParentFont = False
     TabOrder = 4
+  end
+  object btnCancel: TButton
+    Left = 680
+    Height = 25
+    Top = 208
+    Width = 59
+    Caption = 'Cancel'
+    OnClick = btnCancelClick
+    TabOrder = 5
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    left = 331
+    top = 94
   end
 end

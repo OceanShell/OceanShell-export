@@ -14,20 +14,15 @@ type
 
   Tfrmexport = class(TForm)
     btnExport: TButton;
-    btnCancel: TButton;
     CheckGroup1: TCheckGroup;
     btnSelectAll: TLabel;
     Memo1: TMemo;
     rgFormat: TRadioGroup;
     grConversion: TRadioGroup;
-    Timer1: TTimer;
 
-    procedure btnCancelClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
-    procedure CheckGroup1Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnSelectAllClick(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
 
   private
 
@@ -37,7 +32,6 @@ type
 
 var
   frmexport: Tfrmexport;
-  cancel_fl:boolean = false;
 
 implementation
 
@@ -60,10 +54,21 @@ Var
   tbl_count, kt: integer;
   DT1, DT2:TDateTime;
   user_path: string;
+  hh, mm, ss, ms:word;
 begin
  memo1.Clear;
- cancel_fl:=false;
- Timer1.Enabled:=true;
+
+   tbl_count:=0;
+   for kt:=0 to frmexport.CheckGroup1.Items.Count-1 do
+     if frmexport.CheckGroup1.Checked[kt] then begin
+      inc(tbl_count);
+      //showmessage(frmexport.CheckGroup1.Items.Strings[kt]);
+     end;
+
+   if tbl_count=0 then begin
+      showmessage('Variable is not selected!');
+      Exit;
+   end;
 
 
  if frmosmain.ODir.Execute then begin
@@ -72,7 +77,7 @@ begin
 
   DT1:=Now;
   memo1.Lines.Add('...start: ');
-  memo1.Lines.Add(datetimetostr(DT1));
+  memo1.Lines.Add(FormatDateTime('DD.MM.YYYY hh:nn:ss',DT1));
   Application.ProcessMessages;
 
   case rgFormat.ItemIndex of
@@ -85,40 +90,18 @@ begin
 
   memo1.Lines.Add('');
   memo1.Lines.Add('...stop: ');
-  memo1.Lines.Add(datetimetostr(DT2));
+  memo1.Lines.Add(FormatDateTime('DD.MM.YYYY hh:nn:ss',DT2));
   memo1.Lines.Add('');
   memo1.Lines.Add('...time spent: ');
-  memo1.Lines.Add(timetostr(DT2-DT1));
+
+  DecodeTime(DT2-DT1, hh, mm, ss, ms);
+  memo1.Lines.Add('Hours: '+inttostr(hh));
+  memo1.Lines.Add('Minutes: '+inttostr(mm));
+  memo1.Lines.Add('Seconds: '+inttostr(ss));
   Application.ProcessMessages;
 
   OpenDocument(user_path);
-  Timer1.Enabled:=false;
  end;
-end;
-
-procedure Tfrmexport.CheckGroup1Click(Sender: TObject);
-Var
-  kt, tbl_count:integer;
-begin
- tbl_count:=0;
- for kt:=0 to CheckGroup1.Items.Count-1 do
-   if CheckGroup1.Checked[kt] then
-    inc(tbl_count);
-
- if tbl_count=0 then btnExport.Enabled:=false;
-end;
-
-procedure Tfrmexport.btnCancelClick(Sender: TObject);
-begin
-  cancel_fl:=true;
-
-  memo1.Lines.Add('');
-  memo1.Lines.Add('...export cancelled: ');
-  memo1.Lines.Add(datetimetostr(now));
-  Application.ProcessMessages;
-
-  btnExport.Enabled:=true;
-  Timer1.Enabled:=false;
 end;
 
 procedure Tfrmexport.btnSelectAllClick(Sender: TObject);
@@ -133,12 +116,6 @@ begin
  if fl=false then
    btnSelectAll.Caption:='Deselect All' else
    btnSelectAll.Caption:='Select All';
-end;
-
-procedure Tfrmexport.Timer1Timer(Sender: TObject);
-begin
-  Application.ProcessMessages;
-  //showmessage('working');
 end;
 
 end.
