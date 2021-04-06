@@ -20,14 +20,12 @@ type
     Memo1: TMemo;
     rgFormat: TRadioGroup;
     grConversion: TRadioGroup;
-    Timer1: TTimer;
 
     procedure btnCancelClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
-    procedure CheckGroup1Click(Sender: TObject);
+    procedure CheckGroup1ItemClick(Sender: TObject; Index: integer);
     procedure FormShow(Sender: TObject);
     procedure btnSelectAllClick(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
 
   private
 
@@ -63,7 +61,6 @@ Var
 begin
  memo1.Clear;
  cancel_fl:=false;
- Timer1.Enabled:=true;
 
 
  if frmosmain.ODir.Execute then begin
@@ -72,7 +69,7 @@ begin
 
   DT1:=Now;
   memo1.Lines.Add('...start: ');
-  memo1.Lines.Add(datetimetostr(DT1));
+  memo1.Lines.Add(FormatDateTime('DD.MM.YYYY hh:nn:ss',DT1));
   Application.ProcessMessages;
 
   case rgFormat.ItemIndex of
@@ -85,18 +82,17 @@ begin
 
   memo1.Lines.Add('');
   memo1.Lines.Add('...stop: ');
-  memo1.Lines.Add(datetimetostr(DT2));
+  memo1.Lines.Add(FormatDateTime('DD.MM.YYYY hh:nn:ss',DT2));
   memo1.Lines.Add('');
   memo1.Lines.Add('...time spent: ');
   memo1.Lines.Add(timetostr(DT2-DT1));
   Application.ProcessMessages;
 
   OpenDocument(user_path);
-  Timer1.Enabled:=false;
  end;
 end;
 
-procedure Tfrmexport.CheckGroup1Click(Sender: TObject);
+procedure Tfrmexport.CheckGroup1ItemClick(Sender: TObject; Index: integer);
 Var
   kt, tbl_count:integer;
 begin
@@ -105,6 +101,7 @@ begin
    if CheckGroup1.Checked[kt] then
     inc(tbl_count);
 
+ if tbl_count>0 then btnExport.Enabled:=true;
  if tbl_count=0 then btnExport.Enabled:=false;
 end;
 
@@ -114,11 +111,10 @@ begin
 
   memo1.Lines.Add('');
   memo1.Lines.Add('...export cancelled: ');
-  memo1.Lines.Add(datetimetostr(now));
+  memo1.Lines.Add(FormatDateTime('DD.MM.YYYY hh:nn:ss',now));
   Application.ProcessMessages;
 
   btnExport.Enabled:=true;
-  Timer1.Enabled:=false;
 end;
 
 procedure Tfrmexport.btnSelectAllClick(Sender: TObject);
@@ -135,11 +131,6 @@ begin
    btnSelectAll.Caption:='Select All';
 end;
 
-procedure Tfrmexport.Timer1Timer(Sender: TObject);
-begin
-  Application.ProcessMessages;
-  //showmessage('working');
-end;
 
 end.
 

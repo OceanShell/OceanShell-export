@@ -44,8 +44,16 @@ type
     cbCountry: TComboBox;
     chkPeriod: TCheckBox;
     cbSource: TComboBox;
-    dtpDateMax: TDateTimePicker;
-    dtpDateMin: TDateTimePicker;
+    eYYMin: TEdit;
+    eMMMax: TEdit;
+    eMNMin: TEdit;
+    eDDMin: TEdit;
+    eHHMin: TEdit;
+    eMMMin: TEdit;
+    eYYMax: TEdit;
+    eMNMax: TEdit;
+    eDDMax: TEdit;
+    eHHMax: TEdit;
     eLonMax: TEdit;
     eLonMin: TEdit;
     eLatMin: TEdit;
@@ -54,12 +62,16 @@ type
     gbDateandTime: TGroupBox;
     gbRegion: TGroupBox;
     Label1: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
     lbResetSearchStations: TLabel;
     iMeteo: TMenuItem;
     MenuItem1: TMenuItem;
@@ -79,7 +91,12 @@ type
     TabSheet1: TTabSheet;
     TabSheet3: TTabSheet;
 
+    procedure eDDMinMouseLeave(Sender: TObject);
+    procedure eHHMinMouseLeave(Sender: TObject);
     procedure eLatMaxKeyPress(Sender: TObject; var Key: char);
+    procedure eMMMinMouseLeave(Sender: TObject);
+    procedure eMNMinMouseLeave(Sender: TObject);
+    procedure eYYMinMouseLeave(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
 
@@ -137,6 +154,7 @@ var
   StationDateMin, StationDateMax, SDateMin, SDateMax :TDateTime;
   StationDateAddedMin, StationDateAddedMax, StationDateUpdatedMin, StationDateUpdatedMax :TDateTime;
   StationCount, SCount:Integer; //number OD stations in database and selection
+  YYMin, YYMax:word;
 
   CRUISEInfoObtained: boolean = false; //getting CRUISE info on app start
   NavigationOrder:boolean=true; //Stop navigation until all modules responded
@@ -243,10 +261,57 @@ begin
   end;
 end;
 
+
 procedure Tfrmosmain.eLatMaxKeyPress(Sender: TObject; var Key: char);
 begin
   if not (Key in [#45, #8, '0'..'9', DefaultFormatSettings.DecimalSeparator]) then Key:=#0;
 end;
+
+
+
+procedure Tfrmosmain.eYYMinMouseLeave(Sender: TObject);
+begin
+  if (Sender as TEdit).Text<>'' then begin
+   if StrToInt((Sender as TEdit).Text)<YYMin then (Sender as TEdit).Text:=IntToStr(YYMin);
+   if StrToInt((Sender as TEdit).Text)>YYMax then (Sender as TEdit).Text:=IntToStr(YYMax);
+  end else (Sender as TEdit).Text:=IntToStr(YYMin);
+end;
+
+procedure Tfrmosmain.eMNMinMouseLeave(Sender: TObject);
+begin
+  if (Sender as TEdit).Text<>'' then begin
+   if StrToInt((Sender as TEdit).Text)<1 then (Sender as TEdit).Text:='1';
+   if StrToInt((Sender as TEdit).Text)>12 then (Sender as TEdit).Text:='12';
+  end else (Sender as TEdit).Text:='1';
+end;
+
+
+procedure Tfrmosmain.eDDMinMouseLeave(Sender: TObject);
+begin
+if (Sender as TEdit).Text<>'' then begin
+ if StrToInt((Sender as TEdit).Text)<1 then (Sender as TEdit).Text:='1';
+ if StrToInt((Sender as TEdit).Text)>31 then (Sender as TEdit).Text:='31';
+end else (Sender as TEdit).Text:='1';
+end;
+
+
+procedure Tfrmosmain.eHHMinMouseLeave(Sender: TObject);
+begin
+  if (Sender as TEdit).Text<>'' then begin
+   if StrToInt((Sender as TEdit).Text)<0 then (Sender as TEdit).Text:='0';
+   if StrToInt((Sender as TEdit).Text)>23 then (Sender as TEdit).Text:='23';
+  end else (Sender as TEdit).Text:='0';
+end;
+
+
+procedure Tfrmosmain.eMMMinMouseLeave(Sender: TObject);
+begin
+  if (Sender as TEdit).Text<>'' then begin
+   if StrToInt((Sender as TEdit).Text)<0 then (Sender as TEdit).Text:='0';
+   if StrToInt((Sender as TEdit).Text)>59 then (Sender as TEdit).Text:='59';
+  end else (Sender as TEdit).Text:='0';
+end;
+
 
 procedure Tfrmosmain.FormShow(Sender: TObject);
 Var
@@ -321,8 +386,19 @@ begin
     cbCruise.Text    :=Ini.ReadString ( 'osmain', 'station_cruise',    '');
     cbInstitute.Text :=Ini.ReadString ( 'osmain', 'station_institute', '');
     cbProject.Text   :=Ini.ReadString ( 'osmain', 'station_project',   '');
-    dtpDateMin.DateTime:=Ini.ReadDateTime('osmain', 'station_datemin', now);
-    dtpDateMax.DateTime:=Ini.ReadDateTime('osmain', 'station_datemax', now);
+
+    eYYMin.Text      :=Ini.ReadString ( 'osmain', 'year_min',          '0');
+    eMNMin.Text      :=Ini.ReadString ( 'osmain', 'month_min',         '1');
+    eDDMin.Text      :=Ini.ReadString ( 'osmain', 'day_min',           '1');
+    eHHMin.Text      :=Ini.ReadString ( 'osmain', 'hour_min',          '0');
+    eMMMin.Text      :=Ini.ReadString ( 'osmain', 'min_min',           '0');
+
+    eYYmax.Text      :=Ini.ReadString ( 'osmain', 'year_max',          '0');
+    eMNmax.Text      :=Ini.ReadString ( 'osmain', 'month_max',         '12');
+    eDDmax.Text      :=Ini.ReadString ( 'osmain', 'day_max',           '31');
+    eHHmax.Text      :=Ini.ReadString ( 'osmain', 'hour_max',          '23');
+    eMMmax.Text      :=Ini.ReadString ( 'osmain', 'min_max',           '59');
+
   finally
     Ini.Free;
   end;
@@ -352,18 +428,27 @@ dlat, dlon, lat, lon, dist:real;
 time0, time1:TDateTime;
 buf_str, SQL_str, QCFlag_str, cr: string;
 LatMin, LatMax, LonMin, LonMax:real;
+DateMin, DateMax: TDateTime;
 begin
+  DateMin:=EncodeDateTime(StrToInt(eYYMin.Text),
+                          StrToInt(eMNMin.Text),
+                          StrToInt(eDDMin.Text),
+                          StrToInt(eHHMin.Text),
+                          StrToInt(eMMMin.Text),
+                          0,
+                          0);
 
-DecodeDateTime(dtpDateMin.Date, SSYearMin, SSMonthMin, SSDayMin, SSHourMin, SSMinMin, SSSecMin, SSMSecMin);
-DecodeDateTime(dtpDateMax.Date, SSYearMax, SSMonthMax, SSDayMax, SSHourMax, SSMinMax, SSSecMax, SSMSecMax);
+  DateMax:=EncodeDateTime(StrToInt(eYYMax.Text),
+                          StrToInt(eMNMax.Text),
+                          StrToInt(eDDMax.Text),
+                          StrToInt(eHHMax.Text),
+                          StrToInt(eMMMax.Text),
+                          0,
+                          0);
 
-if dtpDateMax.Date<dtpDateMin.Date then
-    if MessageDlg('End date exceeds the beginning date',
-       mtWarning, [mbOk], 0)=mrOk then exit;
+  DecodeDateTime(DateMin, SSYearMin, SSMonthMin, SSDayMin, SSHourMin, SSMinMin, SSSecMin, SSMSecMin);
+  DecodeDateTime(DateMax, SSYearMax, SSMonthMax, SSDayMax, SSHourMax, SSMinMax, SSSecMax, SSMSecMax);
 
-{if SSYearMax-SSYearMin>=10 then
-  if MessageDlg('You are about to select a large amount of data. Proceed?',
-     mtWarning, [mbYes, mbNo], 0)=mrNo then exit;}
 
 try
 // frmdm.Q.DisableControls;
@@ -394,15 +479,12 @@ Application.ProcessMessages;
                        '(LONGITUDE>=-180 and LONGITUDE<='+eLonMax.Text+')) ';
     end;
 
-
- // showmessage(DateTimeToStr(dtpDateMin.DateTime)+ DateTimeToStr(dtpDateMax.DateTime));
     (* Date and Time *)
     // From date to date
-  //  if (dtpDateMin.DateTime<>MinDate) or (dtpDateMax.DateTime<>MaxDate) then begin
       if chkPeriod.Checked=false then begin
        SQL_str:=SQL_str+' AND (DATEANDTIME BETWEEN '+
-                        QuotedStr(FormatDateTime('DD.MM.YYYY hh:nn:ss',dtpDateMin.DateTime))+' AND '+
-                        QuotedStr(FormatDateTime('DD.MM.YYYY hh:nn:ss',dtpDateMax.DateTime))+') ';
+                        QuotedStr(FormatDateTime('DD.MM.YYYY hh:nn:ss',DateMin))+' AND '+
+                        QuotedStr(FormatDateTime('DD.MM.YYYY hh:nn:ss',DateMax))+') ';
       end;
 
      //Date in Period
@@ -601,8 +683,20 @@ begin
   chkNOTInstitute.Checked:=false;
   chkNOTProject.Checked:=false; }
 
-  dtpDateMin.DateTime:=StationDateMin;
-  dtpDateMax.DateTime:=StationDateMax;
+  //dtpDateMin.DateTime:=StationDateMin;
+  ///dtpDateMax.DateTime:=StationDateMax;
+
+  eYYMin.Text:=IntToStr(YYMin);
+  eYYMax.Text:=IntToStr(YYMax);
+  eMNMin.Text:='1';
+  eMNMax.Text:='12';
+  eDDMin.Text:='1';
+  eDDMax.Text:='31';
+  eHHMin.Text:='0';
+  eHHMax.Text:='23';
+  eMMMin.Text:='0';
+  eMMMax.Text:='59';
+
   chkPeriod.Checked:=false;
 end;
 
@@ -631,7 +725,9 @@ Qt_DB1.Transaction:=TRt_DB1;
         SQL.Add(' min(LATITUDE) as StLatMin, max(LATITUDE) as StLatMax, ');
         SQL.Add(' min(LONGITUDE) as StLonMin, max(LONGITUDE) as StLonMax, ');
         SQL.Add(' min(DATEANDTIME) as StDateMin, ');
-        SQL.Add(' max(DATEANDTIME) as StDateMax ');
+        SQL.Add(' max(DATEANDTIME) as StDateMax, ');
+        SQL.Add(' min(Extract(YEAR FROM DATEANDTIME)) as StYYMin, ');
+        SQL.Add(' max(Extract(YEAR FROM DATEANDTIME)) as StYYMax ');
         SQL.Add(' from STATION');
     Open;
       StationCount:=FieldByName('StCount').AsInteger;
@@ -642,6 +738,8 @@ Qt_DB1.Transaction:=TRt_DB1;
          StationLonMax  :=FieldByName('StLonMax').AsFloat;
          StationDateMin :=FieldByName('StDateMin').AsDateTime;
          StationDateMax :=FieldByName('StDateMax').AsDateTime;
+         YYMin          :=FieldByName('StYYMin').Value;
+         YYMax          :=FieldByName('StYYMax').Value;
 
        with sbDatabase do begin
          Panels[1].Text:='LtMin: '+floattostr(StationLatMin);
@@ -658,13 +756,9 @@ Qt_DB1.Transaction:=TRt_DB1;
            eLatMax.Text:=FloatToStr(StationLatMax);
            eLonMin.Text:=FloatToStr(StationLonMin);
            eLonMax.Text:=FloatToStr(StationLonMax);
-
-           dtpDateMin.Date:=StationDateMin;
-           dtpDateMax.Date:=StationDateMax;
        end;
 
-       dtpDateMin.Time:=EncodeTime(0, 0, 0, 0);
-       dtpDateMax.Time:=EncodeTime(23, 59, 59, 999);
+       if eYYMin.Text='' then eYYMin.OnMouseLeave(self);
       end;
     Close;
    end;
@@ -1279,8 +1373,18 @@ begin
     Ini.WriteString  ( 'osmain', 'station_project',  cbProject.Text);
 
     Ini.WriteBool    ( 'osmain', 'station_period',   chkPeriod.Checked);
-    Ini.WriteDateTime( 'osmain', 'station_datemin',  dtpDateMin.DateTime);
-    Ini.WriteDateTime( 'osmain', 'station_datemax',  dtpDateMax.DateTime);
+
+    Ini.WriteString  ( 'osmain', 'year_min',         eYYMin.Text);
+    Ini.WriteString  ( 'osmain', 'month_min',        eMNMin.Text);
+    Ini.WriteString  ( 'osmain', 'day_min',          eDDMin.Text);
+    Ini.WriteString  ( 'osmain', 'hour_min',         eHHMin.Text);
+    Ini.WriteString  ( 'osmain', 'min_min',          eMMMin.Text);
+
+    Ini.WriteString  ( 'osmain', 'year_max',         eYYMax.Text);
+    Ini.WriteString  ( 'osmain', 'month_max',        eMNMax.Text);
+    Ini.WriteString  ( 'osmain', 'day_max',          eDDMax.Text);
+    Ini.WriteString  ( 'osmain', 'hour_max',         eHHMax.Text);
+    Ini.WriteString  ( 'osmain', 'min_max',          eMMMax.Text);
   finally
     Ini.Free;
   end;

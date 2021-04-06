@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="22">
       <Unit0>
         <Filename Value="OceanShellExport.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -151,6 +151,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="timerasthread.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="TimerAsThread"/>
+      </Unit21>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

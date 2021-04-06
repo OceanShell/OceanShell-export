@@ -5,7 +5,7 @@ unit osexport_ascii;
 interface
 
 uses
-  Classes, SysUtils, Dialogs, Variants,
+  Classes, SysUtils, Dialogs, Variants, Forms,
 
   // program modules
   osmain, dm, osexport, osunitsconversion, procedures;
@@ -50,6 +50,8 @@ date1: TDateTime;
 CrID, Cast, QCF, Ver, SrcID, InstID, ProjID, PlatID:integer;
 Src, Inst, Proj, Ctry,  PLat: string;
 StNum, CrNum, PiName, Depth:Variant;
+
+
 
 begin
 
@@ -162,7 +164,7 @@ try
         writeln(md,inttostr(ID), #9,
                    floattostr(Lat), #9,
                    floattostr(lon), #9,
-                   datetimetostr(date1), #9,
+                   FormatDateTime('DD.MM.YYYY hh:nn:ss', date1), #9,
                    inttostr(depth), #9,
                    StNum, #9,
                    inttostr(ver), #9,
@@ -287,7 +289,7 @@ try
    frmdm.q1.Next;
 {S}end;
 
-   //Application.ProcessMessages;
+   Application.ProcessMessages;
    if cancel_fl=true then break;
   frmdm.Q.Next;
 {STEP}end;
@@ -305,7 +307,7 @@ try
 {C}end; {table is checked }
 
    procedures.ProgressTaskbar(kt, frmexport.CheckGroup1.Items.Count-1);
-  // Application.ProcessMessages;
+   Application.ProcessMessages;
    if cancel_fl=true then break;
 {T}end; {tables cycle}
 finally

@@ -10,7 +10,7 @@ unit osexport_hdb;
 interface
 
 uses
-  Classes, SysUtils, Dialogs, Variants,
+  Classes, SysUtils, Dialogs, Variants, Forms,
 
   // program modules
   osmain, dm, osexport, osunitsconversion, procedures;
@@ -336,7 +336,7 @@ writeln(fo,cruise_number+#9+'(cruise_number)');
 writeln(fo,PI_name+#9+'(PI)');
 writeln(fo,floattostr(lat)+#9+'(latitude deg.)');
 writeln(fo,floattostr(lon)+#9+'(longitude deg.)');
-writeln(fo,datetimetostr(dt)+#9+'(station date and time)');
+writeln(fo,FormatDateTime('DD.MM.YYYY hh:nn:ss',dt)+#9+'(station date and time)');
 writeln(fo,inttostr(bd)+#9+'(bottom depth)');
 writeln(fo,stno+#9+'(st_number_origin)');
 writeln(fo,inttostr(stver)+#9+'(station version)');
@@ -358,7 +358,7 @@ writeln(fo,cruise_number);
 writeln(fo,PI_name);
 writeln(fo,floattostr(lat));
 writeln(fo,floattostr(lon));
-writeln(fo,datetimetostr(dt));
+writeln(fo,FormatDateTime('DD.MM.YYYY hh:nn:ss',dt));
 writeln(fo,inttostr(bd));
 writeln(fo,stno);
 writeln(fo,inttostr(stver));
@@ -382,6 +382,10 @@ end;
 
     setlength(DSt,0,0);
 {V}end;
+
+    Application.ProcessMessages;
+   if cancel_fl=true then break;
+
     frmdm.Q.Next;
 {Q}end;
     closefile(fo);

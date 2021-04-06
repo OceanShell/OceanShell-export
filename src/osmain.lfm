@@ -1,32 +1,33 @@
 object frmosmain: Tfrmosmain
-  Left = 385
-  Height = 520
-  Top = 249
-  Width = 920
+  Left = 333
+  Height = 780
+  Top = 149
+  Width = 1380
   Caption = 'OceanShell-Export'
-  ClientHeight = 520
-  ClientWidth = 920
+  ClientHeight = 0
+  ClientWidth = 0
   Color = clBtnFace
-  Constraints.MinHeight = 520
-  Constraints.MinWidth = 920
+  Constraints.MinHeight = 780
+  Constraints.MinWidth = 1380
+  DesignTimePPI = 144
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -17
   Font.Name = 'MS Sans Serif'
   Menu = MM
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '2.0.8.0'
+  LCLVersion = '2.0.6.0'
   object lbResetSearchStations: TLabel
     Cursor = crHandPoint
-    Left = 704
-    Height = 13
-    Top = 104
-    Width = 68
+    Left = 1056
+    Height = 20
+    Top = 156
+    Width = 95
     Caption = 'Reset search'
     Font.Color = clBlue
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsUnderline]
     ParentColor = False
@@ -35,105 +36,105 @@ object frmosmain: Tfrmosmain
   end
   object Panel1: TPanel
     Left = 0
-    Height = 39
+    Height = 76
     Top = 0
-    Width = 920
+    Width = 1380
     Align = alTop
     AutoSize = True
     Caption = 'Panel1'
-    ClientHeight = 39
-    ClientWidth = 920
+    ClientHeight = 76
+    ClientWidth = 1380
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     ParentFont = False
     TabOrder = 1
     object sbSelection: TStatusBar
       Left = 1
-      Height = 18
-      Top = 19
-      Width = 918
+      Height = 36
+      Top = 37
+      Width = 1378
       Align = alTop
-      BorderSpacing.Bottom = 1
+      BorderSpacing.Bottom = 2
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       Panels = <      
         item
           Text = '[Selection]'
-          Width = 71
+          Width = 106
         end      
         item
-          Width = 100
+          Width = 150
         end      
         item
-          Width = 100
+          Width = 150
         end      
         item
-          Width = 120
+          Width = 180
         end      
         item
-          Width = 120
+          Width = 180
         end      
         item
-          Width = 140
+          Width = 210
         end      
         item
-          Width = 145
+          Width = 218
         end      
         item
-          Width = 160
+          Width = 240
         end>
       ParentFont = False
       SimplePanel = False
     end
     object sbDatabase: TStatusBar
       Left = 1
-      Height = 18
+      Height = 36
       Top = 1
-      Width = 918
+      Width = 1378
       Align = alTop
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       Panels = <      
         item
           Text = '[Database]'
-          Width = 71
+          Width = 106
         end      
         item
-          Width = 100
+          Width = 150
         end      
         item
-          Width = 100
+          Width = 150
         end      
         item
-          Width = 120
+          Width = 180
         end      
         item
-          Width = 120
+          Width = 180
         end      
         item
-          Width = 140
+          Width = 210
         end      
         item
-          Width = 145
+          Width = 218
         end      
         item
-          Width = 33
+          Width = 50
         end>
       ParentFont = False
       SimplePanel = False
     end
   end
   object btnSelect: TBitBtn
-    Left = 704
-    Height = 31
-    Top = 64
-    Width = 139
+    Left = 1056
+    Height = 46
+    Top = 96
+    Width = 208
     Caption = 'Select Stations'
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
     Images = frmicons.IL1
@@ -143,70 +144,89 @@ object frmosmain: Tfrmosmain
     TabOrder = 2
   end
   object gbRegion: TGroupBox
-    Left = 16
-    Height = 160
-    Top = 64
-    Width = 384
+    Left = 24
+    Height = 240
+    Top = 96
+    Width = 576
     Caption = 'Region'
-    ClientHeight = 141
-    ClientWidth = 374
+    ClientHeight = 215
+    ClientWidth = 572
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 3
     object pcRegion: TPageControl
-      Left = 15
-      Height = 123
-      Top = 5
-      Width = 353
+      Left = 22
+      Height = 184
+      Top = 8
+      Width = 530
       ActivePage = TabSheet1
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentFont = False
       TabIndex = 0
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = 'Rectangular'
-        ClientHeight = 93
-        ClientWidth = 347
+        ClientHeight = 151
+        ClientWidth = 522
         Font.Color = clWindowText
-        Font.Height = -11
+        Font.Height = -17
         Font.Name = 'MS Sans Serif'
         ParentFont = False
         object eLatMax: TEdit
-          Left = 120
-          Height = 19
-          Top = 8
-          Width = 104
+          Left = 180
+          Height = 28
+          Top = 12
+          Width = 156
           Alignment = taCenter
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
           OnKeyPress = eLatMaxKeyPress
+          ParentFont = False
           TabOrder = 0
         end
         object eLatMin: TEdit
-          Left = 120
-          Height = 19
-          Top = 64
-          Width = 104
+          Left = 180
+          Height = 28
+          Top = 96
+          Width = 156
           Alignment = taCenter
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
+          OnKeyPress = eLatMaxKeyPress
+          ParentFont = False
           TabOrder = 1
         end
         object eLonMin: TEdit
-          Left = 16
-          Height = 19
-          Top = 37
-          Width = 104
+          Left = 24
+          Height = 28
+          Top = 56
+          Width = 156
           Alignment = taCenter
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
+          OnKeyPress = eLatMaxKeyPress
+          ParentFont = False
           TabOrder = 2
         end
         object eLonMax: TEdit
-          Left = 224
-          Height = 19
-          Top = 37
-          Width = 104
+          Left = 336
+          Height = 28
+          Top = 56
+          Width = 156
           Alignment = taCenter
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
+          OnKeyPress = eLatMaxKeyPress
+          ParentFont = False
           TabOrder = 3
         end
       end
@@ -215,176 +235,286 @@ object frmosmain: Tfrmosmain
         ClientHeight = 95
         ClientWidth = 343
         Font.Color = clWindowText
-        Font.Height = -11
+        Font.Height = -17
         Font.Name = 'MS Sans Serif'
         ParentFont = False
         object cbPredefinedRegion: TComboBox
-          Left = 24
-          Height = 20
-          Top = 32
-          Width = 296
+          Left = 36
+          Height = 28
+          Top = 48
+          Width = 444
           Font.Color = clWindowText
-          Font.Height = -11
+          Font.Height = -17
           Font.Name = 'MS Sans Serif'
-          ItemHeight = 26
+          ItemHeight = 20
           OnDropDown = cbPredefinedRegionDropDown
           ParentFont = False
           Style = csDropDownList
           TabOrder = 0
-          Text = '0'
         end
       end
     end
   end
   object gbDateandTime: TGroupBox
-    Left = 416
-    Height = 111
-    Top = 64
-    Width = 267
+    Left = 624
+    Height = 240
+    Top = 96
+    Width = 400
     Caption = 'Date'
-    ClientHeight = 92
-    ClientWidth = 257
+    ClientHeight = 215
+    ClientWidth = 396
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 4
-    object dtpDateMin: TDateTimePicker
-      Left = 16
-      Height = 19
-      Top = 9
-      Width = 149
-      CenturyFrom = 0
-      MaxDate = 2958465
-      MinDate = -53780
+    object chkPeriod: TCheckBox
+      Left = 24
+      Height = 29
+      Top = 160
+      Width = 75
+      Caption = 'Period'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentFont = False
       TabOrder = 0
-      TrailingSeparator = False
-      TextForNullDate = 'NULL'
-      LeadingZeros = True
-      Kind = dtkDateTime
-      TimeFormat = tf24
-      TimeDisplay = tdHMS
-      DateMode = dmComboBox
-      Date = 43775
-      Time = 0.527798784722108
-      UseDefaultSeparators = True
-      HideDateTimeParts = []
-      MonthNames = 'Long'
     end
-    object dtpDateMax: TDateTimePicker
-      Left = 16
-      Height = 19
-      Top = 37
-      Width = 149
-      CenturyFrom = 0
-      MaxDate = 2958465
-      MinDate = 36892
+    object eYYMin: TEdit
+      Left = 24
+      Height = 28
+      Top = 56
+      Width = 61
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eYYMinMouseLeave
       ParentFont = False
       TabOrder = 1
-      TrailingSeparator = False
-      TextForNullDate = 'NULL'
-      LeadingZeros = True
-      Kind = dtkDateTime
-      TimeFormat = tf24
-      TimeDisplay = tdHMS
-      DateMode = dmComboBox
-      Date = 43775
-      Time = 0.986132118057867
-      UseDefaultSeparators = True
-      HideDateTimeParts = []
-      MonthNames = 'Long'
-    end
-    object chkPeriod: TCheckBox
-      Left = 16
-      Height = 18
-      Top = 64
-      Width = 56
-      Caption = 'Period'
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      ParentFont = False
-      TabOrder = 2
     end
     object Label1: TLabel
-      Left = 133
-      Height = 13
-      Top = 15
-      Width = 12
-      Caption = '->'
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
+      Left = 32
+      Height = 20
+      Top = 24
+      Width = 39
+      Caption = 'Year'
       ParentColor = False
+    end
+    object Label8: TLabel
+      Left = 96
+      Height = 20
+      Top = 24
+      Width = 51
+      Caption = 'Month'
+      ParentColor = False
+    end
+    object Label9: TLabel
+      Left = 160
+      Height = 20
+      Top = 24
+      Width = 32
+      Caption = 'Day'
+      ParentColor = False
+    end
+    object Label10: TLabel
+      Left = 224
+      Height = 20
+      Top = 24
+      Width = 40
+      Caption = 'Hour'
+      ParentColor = False
+    end
+    object Label11: TLabel
+      Left = 288
+      Height = 20
+      Top = 24
+      Width = 55
+      Caption = 'Minute'
+      ParentColor = False
+    end
+    object eMNMin: TEdit
+      Left = 104
+      Height = 28
+      Top = 56
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eMNMinMouseLeave
       ParentFont = False
+      TabOrder = 2
+      Text = '1'
+    end
+    object eDDMin: TEdit
+      Left = 160
+      Height = 28
+      Top = 56
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eDDMinMouseLeave
+      ParentFont = False
+      TabOrder = 3
+      Text = '1'
+    end
+    object eHHMin: TEdit
+      Left = 232
+      Height = 28
+      Top = 56
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eHHMinMouseLeave
+      ParentFont = False
+      TabOrder = 4
+      Text = '0'
+    end
+    object eMMMin: TEdit
+      Left = 296
+      Height = 28
+      Top = 56
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eMMMinMouseLeave
+      ParentFont = False
+      TabOrder = 5
+      Text = '0'
+    end
+    object eYYMax: TEdit
+      Left = 24
+      Height = 28
+      Top = 104
+      Width = 61
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eYYMinMouseLeave
+      ParentFont = False
+      TabOrder = 6
+    end
+    object eMNMax: TEdit
+      Left = 104
+      Height = 28
+      Top = 104
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      OnMouseLeave = eMNMinMouseLeave
+      ParentFont = False
+      TabOrder = 7
+      Text = '12'
+    end
+    object eDDMax: TEdit
+      Left = 160
+      Height = 28
+      Top = 104
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      ParentFont = False
+      TabOrder = 8
+      Text = '31'
+    end
+    object eHHMax: TEdit
+      Left = 232
+      Height = 28
+      Top = 104
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      ParentFont = False
+      TabOrder = 9
+      Text = '23'
+    end
+    object eMMMax: TEdit
+      Left = 296
+      Height = 28
+      Top = 104
+      Width = 39
+      Font.Color = clWindowText
+      Font.Height = -17
+      Font.Name = 'MS Sans Serif'
+      NumbersOnly = True
+      ParentFont = False
+      TabOrder = 10
+      Text = '59'
     end
   end
   object gbAuxiliaryParameters: TGroupBox
-    Left = 16
-    Height = 216
-    Top = 240
-    Width = 667
+    Left = 24
+    Height = 324
+    Top = 360
+    Width = 1000
     Caption = 'Auxiliary metadata'
-    ClientHeight = 197
-    ClientWidth = 657
+    ClientHeight = 299
+    ClientWidth = 996
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 5
     object cbSource: TComboBox
-      Left = 69
-      Height = 20
-      Top = 11
-      Width = 579
+      Left = 104
+      Height = 28
+      Top = 16
+      Width = 868
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       DropDownCount = 10
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
-      ItemHeight = 16
+      ItemHeight = 20
       OnDropDown = cbSourceDropDown
       ParentFont = False
       TabOrder = 0
       Text = 'cbSource'
     end
     object cbCountry: TComboBox
-      Left = 69
-      Height = 20
-      Top = 40
-      Width = 579
+      Left = 104
+      Height = 28
+      Top = 60
+      Width = 868
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
-      ItemHeight = 16
+      ItemHeight = 20
       OnDropDown = cbCountryDropDown
       ParentFont = False
       TabOrder = 1
       Text = 'cbCountry'
     end
     object cbPlatform: TComboBox
-      Left = 69
-      Height = 20
-      Top = 70
-      Width = 579
+      Left = 104
+      Height = 28
+      Top = 105
+      Width = 868
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
-      ItemHeight = 16
+      ItemHeight = 20
       OnDropDown = cbPlatformDropDown
       OnSelect = cbPlatformSelect
       ParentFont = False
@@ -392,136 +522,136 @@ object frmosmain: Tfrmosmain
       Text = 'cbPlatform'
     end
     object cbCruise: TComboBox
-      Left = 69
-      Height = 20
-      Top = 100
-      Width = 579
+      Left = 104
+      Height = 28
+      Top = 150
+      Width = 868
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Enabled = False
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
-      ItemHeight = 16
+      ItemHeight = 20
       OnDropDown = cbCruiseDropDown
       ParentFont = False
       TabOrder = 3
       Text = 'cbCruise'
     end
     object cbInstitute: TComboBox
-      Left = 69
-      Height = 20
-      Top = 130
-      Width = 579
+      Left = 104
+      Height = 28
+      Top = 195
+      Width = 868
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
-      ItemHeight = 16
+      ItemHeight = 20
       OnDropDown = cbInstituteDropDown
       ParentFont = False
       TabOrder = 4
       Text = 'cbInstitute'
     end
     object cbProject: TComboBox
-      Left = 69
-      Height = 20
-      Top = 160
-      Width = 579
+      Left = 104
+      Height = 28
+      Top = 240
+      Width = 868
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
-      ItemHeight = 16
+      ItemHeight = 20
       OnDropDown = cbProjectDropDown
       ParentFont = False
       TabOrder = 5
       Text = 'cbProject'
     end
     object Label2: TLabel
-      Left = 17
-      Height = 13
-      Top = 16
-      Width = 37
+      Left = 26
+      Height = 20
+      Top = 24
+      Width = 51
       Caption = 'Source'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
     object Label3: TLabel
-      Left = 15
-      Height = 13
-      Top = 48
-      Width = 42
+      Left = 22
+      Height = 20
+      Top = 72
+      Width = 55
       Caption = 'Country'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
     object Label4: TLabel
-      Left = 17
-      Height = 13
-      Top = 80
-      Width = 44
+      Left = 26
+      Height = 20
+      Top = 120
+      Width = 59
       Caption = 'Platform'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
     object Label5: TLabel
-      Left = 17
-      Height = 13
-      Top = 110
-      Width = 34
+      Left = 26
+      Height = 20
+      Top = 165
+      Width = 45
       Caption = 'Cruise'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
     object Label6: TLabel
-      Left = 17
-      Height = 13
-      Top = 136
-      Width = 43
+      Left = 26
+      Height = 20
+      Top = 204
+      Width = 58
       Caption = 'Institute'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
     object Label7: TLabel
-      Left = 17
-      Height = 13
-      Top = 168
-      Width = 37
+      Left = 26
+      Height = 20
+      Top = 252
+      Width = 49
       Caption = 'Project'
       Font.Color = clWindowText
-      Font.Height = -11
+      Font.Height = -17
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
   end
   object btnMap: TBitBtn
-    Left = 704
-    Height = 31
-    Top = 152
-    Width = 139
+    Left = 1056
+    Height = 46
+    Top = 228
+    Width = 208
     Caption = 'Show Map'
     Enabled = False
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Images = frmicons.IL1
     ImageIndex = 984
@@ -530,14 +660,14 @@ object frmosmain: Tfrmosmain
     TabOrder = 6
   end
   object btnExport: TBitBtn
-    Left = 704
-    Height = 31
-    Top = 193
-    Width = 139
+    Left = 1056
+    Height = 46
+    Top = 290
+    Width = 208
     Caption = 'Export Data'
     Enabled = False
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     Images = frmicons.IL1
     ImageIndex = 317
@@ -546,12 +676,12 @@ object frmosmain: Tfrmosmain
     TabOrder = 7
   end
   object ListBox1: TListBox
-    Left = 405
-    Height = 49
-    Top = 1
-    Width = 121
+    Left = 608
+    Height = 74
+    Top = 2
+    Width = 182
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     ItemHeight = 0
     ParentFont = False
@@ -560,32 +690,32 @@ object frmosmain: Tfrmosmain
   end
   object ProgressBar1: TProgressBar
     Left = 0
-    Height = 20
-    Top = 500
-    Width = 920
+    Height = 30
+    Top = 720
+    Width = 1380
     Align = alBottom
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -17
     Font.Name = 'MS Sans Serif'
     ParentFont = False
     TabOrder = 8
   end
   object OD: TOpenDialog
     Options = [ofHideReadOnly, ofEnableSizing, ofDontAddToRecent]
-    left = 320
+    left = 480
   end
   object SD: TSaveDialog
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    left = 360
+    left = 540
   end
   object ODir: TSelectDirectoryDialog
     Options = [ofCreatePrompt, ofEnableSizing, ofViewDetail]
-    left = 283
+    left = 425
   end
   object MM: TMainMenu
     Images = frmicons.IL1
-    left = 320
-    top = 181
+    left = 480
+    top = 272
     object MenuItem1: TMenuItem
       Caption = 'File'
       object iClose: TMenuItem
