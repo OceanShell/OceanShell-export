@@ -5,8 +5,8 @@ object frmexport: Tfrmexport
   Width = 1128
   BorderStyle = bsSingle
   Caption = 'Selection'
-  ClientHeight = 0
-  ClientWidth = 0
+  ClientHeight = 644
+  ClientWidth = 1128
   DesignTimePPI = 144
   OnShow = FormShow
   Position = poOwnerFormCenter

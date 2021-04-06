@@ -129,6 +129,8 @@ begin
  if fl=false then
    btnSelectAll.Caption:='Deselect All' else
    btnSelectAll.Caption:='Select All';
+
+ CheckGroup1.OnItemClick(self, 0);
 end;
 
 
