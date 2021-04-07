@@ -100,7 +100,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
 
-    procedure btnDensityClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
     procedure cbCruiseDropDown(Sender: TObject);
     procedure cbProjectDropDown(Sender: TObject);
@@ -113,7 +112,6 @@ type
     procedure cbCountryDropDown(Sender: TObject);
     procedure cbInstituteDropDown(Sender: TObject);
     procedure cbPlatformDropDown(Sender: TObject);
-    procedure cbPredefinedRegionDropDown(Sender: TObject);
     procedure cbSourceDropDown(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -202,7 +200,7 @@ uses
 procedure Tfrmosmain.FormCreate(Sender: TObject);
 Var
   Ini: TIniFile;
-  server, DBPath, DBHost, DBUser, DBPass:string;
+  server, DBPath, DBHost, DBUser, DBPass, DBIni:string;
 begin
 
  (* Defining Global Path - application root lolder *)
@@ -213,13 +211,30 @@ begin
 
  // showmessage(GlobalPath);
 
-  if not FileExists(GlobalPath+'database.ini') then
-    if MessageDlg('Please, put database.ini next to the program',
-       mtWarning, [mbOk], 0)=MrOk then exit;
 
   server:='firebird';
 
-  Ini := TIniFile.Create(GlobalPath+'database.ini');
+  DBIni:='';
+  Ini := TIniFile.Create(GetUserDir+'.oceanshell');
+  try
+    DBIni :=Ini.ReadString('main', 'DBIni',  GlobalPath+'database.ini');
+      if DBIni='' then begin
+       OD.Title:='Select database.ini';
+       OD.Filter:='database.ini|database.ini';
+       if OD.Execute then begin
+          DBIni:=OD.FileName;
+          Ini.WriteString('main', 'DBIni', DBIni);
+       end;
+      end;
+  finally
+    Ini.Free;
+  end;
+
+  if DBIni='' then halt;
+
+
+
+  Ini := TIniFile.Create(DBIni);
   try
     DBUser :=Ini.ReadString(server, 'user',     'SYSDBA');
     DBPass :=Ini.ReadString(server, 'pass',     'masterkey');
@@ -315,6 +330,8 @@ end;
 procedure Tfrmosmain.FormShow(Sender: TObject);
 Var
   Ini:TIniFile;
+  fdb:TSearchRec;
+  fname: string;
 begin
 
 (* flags on open forms *)
@@ -363,6 +380,21 @@ begin
   (* Define global delimiter *)
   DefaultFormatSettings.DecimalSeparator := '.';
 
+
+fdb.Name:='';
+cbPredefinedRegion.Clear;
+//showmessage(GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+'*.bln');
+ FindFirst(GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+'*.bln',faAnyFile, fdb);
+  if fdb.Name<>'' then begin
+   fname:=ExtractFileName(fdb.Name);
+    cbPredefinedRegion.Items.Add(copy(fname,1, length(fname)-4));
+     while findnext(fdb)=0 do begin
+       fname:=ExtractFileName(fdb.Name);
+       cbPredefinedRegion.Items.Add(copy(fname,1, length(fname)-4));
+     end;
+  end;
+ FindClose(fdb);
+
   (* Loading settings from INI file *)
   Ini := TIniFile.Create(IniFileName);
   try
@@ -405,11 +437,6 @@ begin
   if cbCruise.Text<>'' then cbCruise.Enabled:=true;
 
   DatabaseInfo;
-end;
-
-procedure Tfrmosmain.btnDensityClick(Sender: TObject);
-begin
-
 end;
 
 
@@ -844,25 +871,6 @@ begin
   end;
 end;
 
-
-procedure Tfrmosmain.cbPredefinedRegionDropDown(Sender: TObject);
-Var
-  fdb:TSearchRec;
-  fname: string;
-begin
-fdb.Name:='';
-cbPredefinedRegion.Clear;
- FindFirst(GlobalPath+'support'+PathDelim+'sea_borders'+PathDelim+'*.bln',faAnyFile, fdb);
-  if fdb.Name<>'' then begin
-   fname:=ExtractFileName(fdb.Name);
-    cbPredefinedRegion.Items.Add(copy(fname,1, length(fname)-4));
-     while findnext(fdb)=0 do begin
-       fname:=ExtractFileName(fdb.Name);
-       cbPredefinedRegion.Items.Add(copy(fname,1, length(fname)-4));
-     end;
-  end;
- FindClose(fdb);
-end;
 
 procedure Tfrmosmain.cbPlatformDropDown(Sender: TObject);
 Var
