@@ -187,7 +187,6 @@ uses
 (* core modules *)
   dm,
   ArbytraryRegion,
-  osdensity,
   osabout,
 
 (* data export *)
@@ -635,8 +634,8 @@ Application.ProcessMessages;
      SQL.Add('ORDER BY DATEANDTIME ');
 
      (* Show the query before executing *)
-  {  if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
-                  mtInformation, [mbYes, mbNo],0)=mrNo then exit; }
+  { if MessageDlg(SQL.Text+#13+#13+'Execute the query?',
+                  mtInformation, [mbYes, mbNo],0)=mrNo then exit;  }
 
    // memo1.lines.Add(SQL.Text);
     Open;
@@ -746,8 +745,8 @@ Qt_DB1.Transaction:=TRt_DB1;
          Panels[2].Text:='LtMax: '+floattostr(StationLatMax);
          Panels[3].Text:='LnMin: '+floattostr(StationLonMin);
          Panels[4].Text:='LnMax: '+floattostr(StationLonMax);
-         Panels[5].Text:='DateMin: '+datetostr(StationDateMin);
-         Panels[6].Text:='DateMax: '+datetostr(StationDateMax);
+         Panels[5].Text:='DateMin: '+FormatDateTime('DD.MM.YYYY', StationDateMin);
+         Panels[6].Text:='DateMax: '+FormatDateTime('DD.MM.YYYY', StationDateMax);
          Panels[7].Text:='Stations: '+inttostr(StationCount);
        end;
 
@@ -828,8 +827,8 @@ begin
          Panels[2].Text:='LtMax: '+floattostr(SLatMax);
          Panels[3].Text:='LnMin: '+floattostr(SLonMin);
          Panels[4].Text:='LnMax: '+floattostr(SLonMax);
-         Panels[5].Text:='DateMin: '+datetostr(SDateMin);
-         Panels[6].Text:='DateMax: '+datetostr(SDateMax);
+         Panels[5].Text:='DateMin: '+FormatDateTime('DD.MM.YYYY',SDateMin);
+         Panels[6].Text:='DateMax: '+FormatDateTime('DD.MM.YYYY',SDateMax);
          Panels[7].Text:='Stations: '+inttostr(SCount);
        end;
      end else for k:=1 to 7 do sbSelection.Panels[k].Text:='---';
