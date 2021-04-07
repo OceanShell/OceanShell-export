@@ -418,13 +418,13 @@ cbPredefinedRegion.Clear;
     cbInstitute.Text :=Ini.ReadString ( 'osmain', 'station_institute', '');
     cbProject.Text   :=Ini.ReadString ( 'osmain', 'station_project',   '');
 
-    eYYMin.Text      :=Ini.ReadString ( 'osmain', 'year_min',          '0');
+    eYYMin.Text      :=Ini.ReadString ( 'osmain', 'year_min',          '1772');
     eMNMin.Text      :=Ini.ReadString ( 'osmain', 'month_min',         '1');
     eDDMin.Text      :=Ini.ReadString ( 'osmain', 'day_min',           '1');
     eHHMin.Text      :=Ini.ReadString ( 'osmain', 'hour_min',          '0');
     eMMMin.Text      :=Ini.ReadString ( 'osmain', 'min_min',           '0');
 
-    eYYmax.Text      :=Ini.ReadString ( 'osmain', 'year_max',          '0');
+    eYYmax.Text      :=Ini.ReadString ( 'osmain', 'year_max',          '2020');
     eMNmax.Text      :=Ini.ReadString ( 'osmain', 'month_max',         '12');
     eDDmax.Text      :=Ini.ReadString ( 'osmain', 'day_max',           '31');
     eHHmax.Text      :=Ini.ReadString ( 'osmain', 'hour_max',          '23');
