@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  LCLintf;
+  LCLintf, ComCtrls;
 
 type
 
@@ -18,6 +18,7 @@ type
     CheckGroup1: TCheckGroup;
     btnSelectAll: TLabel;
     Memo1: TMemo;
+    ProgressBar1: TProgressBar;
     rgFormat: TRadioGroup;
     grConversion: TRadioGroup;
 
@@ -48,6 +49,13 @@ uses osmain, osexport_ascii, osexport_hdb, osexport_netcdf;
 
 procedure Tfrmexport.FormShow(Sender: TObject);
 begin
+
+   {$IFDEF UNIX}
+    progressbar1.Visible:=true;
+  {$ELSE}
+    progressbar1.Visible:=false;
+  {$ENDIF}
+
   CheckGroup1.items:=frmosmain.ListBox1.Items;
 
   TRadioButton(rgFormat.Controls[2]).Enabled := False;

@@ -8,7 +8,7 @@ uses
   SysUtils, Variants, Classes, Graphics, Controls, Forms, ComCtrls, LCLType,
   Menus, Dialogs, ActnList, StdCtrls, IniFiles, ExtCtrls, DateUtils, sqldb, DB,
   Buttons, DBGrids, Spin, DBCtrls, DateTimePicker, dynlibs, LCLIntf, ComboEx,
-  FileCtrl;
+  FileCtrl, EditBtn;
 
 type
    MapDS=record
@@ -44,34 +44,21 @@ type
     cbCountry: TComboBox;
     chkPeriod: TCheckBox;
     cbSource: TComboBox;
-    eYYMin: TEdit;
-    eMMMax: TEdit;
-    eMNMin: TEdit;
-    eDDMin: TEdit;
-    eHHMin: TEdit;
-    eMMMin: TEdit;
-    eYYMax: TEdit;
-    eMNMax: TEdit;
-    eDDMax: TEdit;
-    eHHMax: TEdit;
-    eLonMax: TEdit;
-    eLonMin: TEdit;
-    eLatMin: TEdit;
-    eLatMax: TEdit;
+    dtpDateMin: TDateTimePicker;
+    dtpDateMax: TDateTimePicker;
+    eLonMax: TFloatSpinEdit;
+    eLonMin: TFloatSpinEdit;
+    eLatMin: TFloatSpinEdit;
+    eLatMax: TFloatSpinEdit;
     gbAuxiliaryParameters: TGroupBox;
     gbDateandTime: TGroupBox;
     gbRegion: TGroupBox;
-    Label1: TLabel;
-    Label10: TLabel;
-    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
-    Label8: TLabel;
-    Label9: TLabel;
     lbResetSearchStations: TLabel;
     iMeteo: TMenuItem;
     MenuItem1: TMenuItem;
@@ -82,7 +69,6 @@ type
     Panel1: TPanel;
     pcRegion: TPageControl;
     ODir: TSelectDirectoryDialog;
-    ProgressBar1: TProgressBar;
     sbDatabase: TStatusBar;
     sbSelection: TStatusBar;
     OD: TOpenDialog;
@@ -212,7 +198,7 @@ begin
  // showmessage(GlobalPath);
 
 
-  server:='firebird';
+ { server:='firebird';
 
   DBIni:='';
   Ini := TIniFile.Create(GetUserDir+'.oceanshell');
@@ -243,6 +229,7 @@ begin
   finally
     Ini.Free;
   end;
+  }
 
   with frmdm.DBLoader do begin
     {$IFDEF WINDOWS}
@@ -261,10 +248,10 @@ begin
     with frmdm.IBDB do begin
       Params.Clear;
       Connected:=false;
-      UserName:=DBUser;
-      Password:=DBPass;
-      HostName:=DBHost;
-      DatabaseName:=DBPath;
+      //UserName:=;
+    //  Password:=DBPass;
+      HostName:='158.39.74.243';
+      DatabaseName:='COMFORT_v1';
       Params.Add('WireCompression=true');
       Connected:=true;
     end;
@@ -345,13 +332,6 @@ begin
     Ini.Free;
   end;
 
-
-  {$IFDEF UNIX}
-    progressbar1.Visible:=true;
-  {$ELSE}
-    progressbar1.Visible:=false;
-  {$ENDIF}
-
   (* Loading TEOS-2010 dynamic library *)
   {$IFDEF WINDOWS}
     libgswteos:=LoadLibrary(PChar(GlobalPath+'libgswteos-10.dll'));
@@ -406,10 +386,10 @@ cbPredefinedRegion.Clear;
 
     (* STATION search settings *)
     pcRegion.ActivePageIndex:=Ini.ReadInteger( 'osmain', 'station_region_pcRegion', 0);
-    eLatMin.Text  :=Ini.ReadString  ( 'osmain', 'station_latmin',     '0');
-    eLatMax.Text  :=Ini.ReadString  ( 'osmain', 'station_latmax',     '0');
-    eLonMin.Text  :=Ini.ReadString  ( 'osmain', 'station_lonmin',     '0');
-    eLonMax.Text  :=Ini.ReadString  ( 'osmain', 'station_lonmax',     '0');
+    eLatMin.Value    :=Ini.ReadFloat  ( 'osmain', 'station_latmin',     0);
+    eLatMax.Value    :=Ini.ReadFloat  ( 'osmain', 'station_latmax',     0);
+    eLonMin.Value    :=Ini.ReadFloat  ( 'osmain', 'station_lonmin',     0);
+    eLonMax.Value    :=Ini.ReadFloat  ( 'osmain', 'station_lonmax',     0);
     chkPeriod.Checked:=Ini.ReadBool   ( 'osmain', 'station_period', false);
     cbPlatform.Text  :=Ini.ReadString ( 'osmain', 'station_platform',  '');
     cbCountry.Text   :=Ini.ReadString ( 'osmain', 'station_country',   '');
@@ -418,17 +398,8 @@ cbPredefinedRegion.Clear;
     cbInstitute.Text :=Ini.ReadString ( 'osmain', 'station_institute', '');
     cbProject.Text   :=Ini.ReadString ( 'osmain', 'station_project',   '');
 
-    eYYMin.Text      :=Ini.ReadString ( 'osmain', 'year_min',          '1772');
-    eMNMin.Text      :=Ini.ReadString ( 'osmain', 'month_min',         '1');
-    eDDMin.Text      :=Ini.ReadString ( 'osmain', 'day_min',           '1');
-    eHHMin.Text      :=Ini.ReadString ( 'osmain', 'hour_min',          '0');
-    eMMMin.Text      :=Ini.ReadString ( 'osmain', 'min_min',           '0');
-
-    eYYmax.Text      :=Ini.ReadString ( 'osmain', 'year_max',          '2020');
-    eMNmax.Text      :=Ini.ReadString ( 'osmain', 'month_max',         '12');
-    eDDmax.Text      :=Ini.ReadString ( 'osmain', 'day_max',           '31');
-    eHHmax.Text      :=Ini.ReadString ( 'osmain', 'hour_max',          '23');
-    eMMmax.Text      :=Ini.ReadString ( 'osmain', 'min_max',           '59');
+    dtpDateMin.DateTime:=Ini.ReadDateTime ( 'osmain', 'date_min', now);
+    dtpDateMax.DateTime:=Ini.ReadDateTime ( 'osmain', 'date_max', now);
 
   finally
     Ini.Free;
@@ -456,21 +427,8 @@ buf_str, SQL_str, QCFlag_str, cr: string;
 LatMin, LatMax, LonMin, LonMax:real;
 DateMin, DateMax: TDateTime;
 begin
-  DateMin:=EncodeDateTime(StrToInt(eYYMin.Text),
-                          StrToInt(eMNMin.Text),
-                          StrToInt(eDDMin.Text),
-                          StrToInt(eHHMin.Text),
-                          StrToInt(eMMMin.Text),
-                          0,
-                          0);
-
-  DateMax:=EncodeDateTime(StrToInt(eYYMax.Text),
-                          StrToInt(eMNMax.Text),
-                          StrToInt(eDDMax.Text),
-                          StrToInt(eHHMax.Text),
-                          StrToInt(eMMMax.Text),
-                          0,
-                          0);
+  DateMin:=dtpDateMin.DateTime;
+  DateMax:=dtpDateMax.DateTime;
 
   DecodeDateTime(DateMin, SSYearMin, SSMonthMin, SSDayMin, SSHourMin, SSMinMin, SSSecMin, SSMSecMin);
   DecodeDateTime(DateMax, SSYearMax, SSMonthMax, SSDayMax, SSHourMax, SSMinMax, SSSecMax, SSMSecMax);
@@ -709,19 +667,8 @@ begin
   chkNOTInstitute.Checked:=false;
   chkNOTProject.Checked:=false; }
 
-  //dtpDateMin.DateTime:=StationDateMin;
-  ///dtpDateMax.DateTime:=StationDateMax;
-
-  eYYMin.Text:=IntToStr(YYMin);
-  eYYMax.Text:=IntToStr(YYMax);
-  eMNMin.Text:='1';
-  eMNMax.Text:='12';
-  eDDMin.Text:='1';
-  eDDMax.Text:='31';
-  eHHMin.Text:='0';
-  eHHMax.Text:='23';
-  eMMMin.Text:='0';
-  eMMMax.Text:='59';
+  dtpDateMin.DateTime:=StationDateMin;
+  dtpDateMax.DateTime:=StationDateMax;
 
   chkPeriod.Checked:=false;
 end;
@@ -784,7 +731,7 @@ Qt_DB1.Transaction:=TRt_DB1;
            eLonMax.Text:=FloatToStr(StationLonMax);
        end;
 
-       if eYYMin.Text='' then eYYMin.OnMouseLeave(self);
+       //if eYYMin.Text='' then eYYMin.OnMouseLeave(self);
       end;
     Close;
    end;
@@ -1368,10 +1315,12 @@ begin
   Ini := TIniFile.Create(IniFileName);
   try
     Ini.WriteInteger ( 'osmain', 'station_region_pcRegion', pcRegion.ActivePageIndex);
-    Ini.WriteString  ( 'osmain', 'station_latmin',   eLatMin.Text);
-    Ini.WriteString  ( 'osmain', 'station_latmax',   eLatMax.Text);
-    Ini.WriteString  ( 'osmain', 'station_lonmin',   eLonMin.Text);
-    Ini.WriteString  ( 'osmain', 'station_lonmax',   eLonMax.Text);
+
+    Ini.WriteFloat   ( 'osmain', 'station_latmin',   eLatMin.Value);
+    Ini.WriteFloat   ( 'osmain', 'station_latmax',   eLatMax.Value);
+    Ini.WriteFloat   ( 'osmain', 'station_lonmin',   eLonMin.Value);
+    Ini.WriteFloat   ( 'osmain', 'station_lonmax',   eLonMax.Value);
+
     Ini.WriteString  ( 'osmain', 'station_platform', cbPlatform.Text);
     Ini.WriteString  ( 'osmain', 'station_country',  cbCountry.Text);
     Ini.WriteString  ( 'osmain', 'station_source',   cbSource.Text);
@@ -1381,17 +1330,9 @@ begin
 
     Ini.WriteBool    ( 'osmain', 'station_period',   chkPeriod.Checked);
 
-    Ini.WriteString  ( 'osmain', 'year_min',         eYYMin.Text);
-    Ini.WriteString  ( 'osmain', 'month_min',        eMNMin.Text);
-    Ini.WriteString  ( 'osmain', 'day_min',          eDDMin.Text);
-    Ini.WriteString  ( 'osmain', 'hour_min',         eHHMin.Text);
-    Ini.WriteString  ( 'osmain', 'min_min',          eMMMin.Text);
+    Ini.WriteDateTime ( 'osmain', 'date_min',     dtpDateMin.DateTime);
+    Ini.WriteDateTime ( 'osmain', 'date_max',     dtpDateMax.DateTime);
 
-    Ini.WriteString  ( 'osmain', 'year_max',         eYYMax.Text);
-    Ini.WriteString  ( 'osmain', 'month_max',        eMNMax.Text);
-    Ini.WriteString  ( 'osmain', 'day_max',          eDDMax.Text);
-    Ini.WriteString  ( 'osmain', 'hour_max',         eHHMax.Text);
-    Ini.WriteString  ( 'osmain', 'min_max',          eMMMax.Text);
   finally
     Ini.Free;
   end;
@@ -1470,6 +1411,8 @@ begin
    finally
      Ini.Free;
    end;
+
+   SaveSettingsStationSearch;
 
    cbPlatform.Clear;
    cbCountry.Clear;

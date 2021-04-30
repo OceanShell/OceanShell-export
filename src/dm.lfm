@@ -9,10 +9,12 @@ object frmdm: Tfrmdm
   object IBDB: TIBConnection
     Connected = False
     LoginPrompt = False
+    DatabaseName = 'COMFORT_v1'
     KeepConnection = False
-    Password = 'masterkey'
+    Password = 'COMFORT_USER_PASS'
     Transaction = TR
-    UserName = 'SYSDBA'
+    UserName = 'COMFORT_USER'
+    HostName = '158.39.74.243'
     LogEvents = []
     CheckTransactionParams = False
     left = 36

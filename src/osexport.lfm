@@ -1,11 +1,11 @@
 object frmexport: Tfrmexport
   Left = 405
-  Height = 644
+  Height = 663
   Top = 210
   Width = 1128
   BorderStyle = bsSingle
   Caption = 'Selection'
-  ClientHeight = 644
+  ClientHeight = 663
   ClientWidth = 1128
   DesignTimePPI = 144
   OnShow = FormShow
@@ -83,7 +83,7 @@ object frmexport: Tfrmexport
   end
   object Memo1: TMemo
     Left = 832
-    Height = 224
+    Height = 221
     Top = 372
     Width = 272
     BorderStyle = bsNone
@@ -123,5 +123,17 @@ object frmexport: Tfrmexport
     OnClick = btnCancelClick
     ParentFont = False
     TabOrder = 5
+  end
+  object ProgressBar1: TProgressBar
+    Left = 0
+    Height = 30
+    Top = 633
+    Width = 1128
+    Align = alBottom
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'MS Sans Serif'
+    ParentFont = False
+    TabOrder = 6
   end
 end
