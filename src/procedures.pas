@@ -9,7 +9,7 @@ uses
   Registry, ShlObj, comobj, Win32Int, InterfaceBase,
 {$ENDIF}
 
-  SysUtils, Variants, Dialogs, DateUtils, Forms, osmain, Math;
+  SysUtils, Variants, Dialogs, DateUtils, Forms, osmain, osexport, Math;
 
 function CheckKML:boolean;
 function ClearDir(Dir:string ): boolean;
@@ -46,7 +46,7 @@ begin
     FTaskBarList.SetProgressValue(AppHandle, k, max_k);
   {$ENDIF}
   {$ifdef UNIX}
-    frmosmain.progressbar1.Position:=trunc(k/max_k)*100;
+    frmexport.ProgressBar1.Position:=trunc(k/max_k)*100;
   {$ENDIF}
 end;
 

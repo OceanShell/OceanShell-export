@@ -244,14 +244,16 @@ begin
     Enabled:=true;
   end;
 
+
+  DBHost:= '158.39.74.243';
+  DBPath:= 'COMFORT_v1';
+
   try
     with frmdm.IBDB do begin
       Params.Clear;
       Connected:=false;
-      //UserName:=;
-    //  Password:=DBPass;
-      HostName:='158.39.74.243';
-      DatabaseName:='COMFORT_v1';
+      HostName:=DBHost;
+      DatabaseName:=DBPath;
       Params.Add('WireCompression=true');
       Connected:=true;
     end;
