@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  LCLintf, ComCtrls;
+  LCLintf, ComCtrls, fphttpclient, fpjson, jsonparser;
 
 type
 
@@ -15,6 +15,7 @@ type
   Tfrmexport = class(TForm)
     btnExport: TButton;
     btnCancel: TButton;
+    chkServer: TCheckBox;
     CheckGroup1: TCheckGroup;
     btnSelectAll: TLabel;
     Memo1: TMemo;
@@ -25,6 +26,7 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure btnExportClick(Sender: TObject);
     procedure CheckGroup1ItemClick(Sender: TObject; Index: integer);
+    procedure chkServerChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btnSelectAllClick(Sender: TObject);
 
@@ -44,7 +46,7 @@ implementation
 
 { Tfrmexport }
 
-uses osmain, osexport_ascii, osexport_hdb, osexport_netcdf;
+uses osmain, dm, osexport_ascii, osexport_hdb, osexport_netcdf;
 
 
 procedure Tfrmexport.FormShow(Sender: TObject);
@@ -59,13 +61,18 @@ begin
   CheckGroup1.items:=frmosmain.ListBox1.Items;
 
   TRadioButton(rgFormat.Controls[2]).Enabled := False;
+  TRadioButton(grConversion.Controls[1]).Enabled := False;
 end;
 
 procedure Tfrmexport.btnExportClick(Sender: TObject);
 Var
+  Client: TFPHttpClient;
+  Response : TStream;
+
   tbl_count, kt: integer;
   DT1, DT2:TDateTime;
-  user_path: string;
+  user_path, par_str, Params, sql, mode: string;
+  tmark:int64;
 begin
  memo1.Clear;
  cancel_fl:=false;
@@ -80,10 +87,62 @@ begin
   memo1.Lines.Add(FormatDateTime('DD.MM.YYYY hh:nn:ss',DT1));
   Application.ProcessMessages;
 
-  case rgFormat.ItemIndex of
-   0: osexport_ascii.ExportASCII(user_path, grConversion.ItemIndex);
-   1: osexport_hdb.ExportHDB(user_path, grConversion.ItemIndex); //0-ices, 1-precise
-   2: osexport_netcdf.ExportNetCDF(user_path, grConversion.ItemIndex);
+  (* local export *)
+  if chkServer.Checked=false then begin
+    case rgFormat.ItemIndex of
+     0: osexport_ascii.ExportASCII(user_path, grConversion.ItemIndex);
+     1: osexport_hdb.ExportHDB(user_path, grConversion.ItemIndex); //0-ices, 1-precise
+     2: osexport_netcdf.ExportNetCDF(user_path, grConversion.ItemIndex);
+    end;
+  end;
+
+  (* server side export *)
+  if chkServer.Checked=true then begin
+    par_str:='';
+    for kt:=0 to CheckGroup1.Items.Count-1 do
+     if CheckGroup1.Checked[kt] then
+         par_str:=par_str+'","P_'+CheckGroup1.Items.Strings[kt];
+
+    par_str:=copy(par_str, 3, length(par_str))+'"';
+
+    sql:=trim(StringReplace(frmdm.Q.SQL.Text, LineEnding, ' ', [rfReplaceAll]));
+
+    tmark:=getTickCount64;
+
+     case rgFormat.ItemIndex of
+      0: mode:='ascii';
+      1: mode:='hdb';
+      // 2: mode:='netcdf';
+     end;
+
+    Params:= '{'+
+             '"time": "'+inttostr(tmark)+'",'+
+             '"tables": ['+par_str+'],'+
+             '"sql": "'+sql+'",'+
+             '"conv": "'+inttostr(grConversion.Itemindex)+'",'+
+             '"mode": "'+mode+'"'+
+             '}';
+
+    Client := TFPHttpClient.Create(nil);
+    Client.AddHeader('User-Agent','Mozilla/5.0 (compatible; fpweb)');
+    Client.AddHeader('Content-Type','application/json; charset=UTF-8');
+    Client.AddHeader('Accept', 'application/json');
+    Client.AllowRedirect := true;
+    Client.RequestBody := TStringStream.Create(Params);
+
+    Response := TFileStream.Create(user_path+inttostr(tmark)+'.zip', fmCreate);
+    try
+        try
+            Client.Get('http://158.39.77.222/export', Response);
+         // Client.Get('http://127.0.0.1:5000/export', Response);
+        except on E:Exception do
+          showmessage('Something bad happened in Post Request : ' + E.Message);
+        end;
+    finally
+        Client.RequestBody.Free;
+        Client.Free;
+        Response.Free;
+    end;
   end;
 
   DT2:=Now;
@@ -111,6 +170,11 @@ begin
 
  if tbl_count>0 then btnExport.Enabled:=true;
  if tbl_count=0 then btnExport.Enabled:=false;
+end;
+
+procedure Tfrmexport.chkServerChange(Sender: TObject);
+begin
+ TRadioButton(grConversion.Controls[1]).Enabled := Not chkServer.Checked;
 end;
 
 procedure Tfrmexport.btnCancelClick(Sender: TObject);

@@ -244,9 +244,14 @@ begin
     Enabled:=true;
   end;
 
-
   DBHost:= '158.39.74.243';
   DBPath:= 'COMFORT_v1';
+
+
+{  DBHost:= 'localhost';
+  DBPath:= 'Z:\OceanShell\databases\OCEAN.FDB';
+  DBUser :='SYSDBA';
+  DBPass :='masterkey';  }
 
   try
     with frmdm.IBDB do begin
@@ -254,6 +259,8 @@ begin
       Connected:=false;
       HostName:=DBHost;
       DatabaseName:=DBPath;
+    //  UserName:=DBUser;
+    //  Password:=DBPass;
       Params.Add('WireCompression=true');
       Connected:=true;
     end;
@@ -618,7 +625,7 @@ Application.ProcessMessages;
      // SQL.Add(' WHERE ');
       SQL.Add(SQL_str);
      end;
-     SQL.Add('ORDER BY DATEANDTIME ');
+     SQL.Add(' ORDER BY DATEANDTIME ');
 
      (* Show the query before executing *)
   { if MessageDlg(SQL.Text+#13+#13+'Execute the query?',

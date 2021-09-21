@@ -1,7 +1,7 @@
 object frmexport: Tfrmexport
-  Left = 405
+  Left = 445
   Height = 663
-  Top = 210
+  Top = 172
   Width = 1128
   BorderStyle = bsSingle
   Caption = 'Selection'
@@ -60,7 +60,7 @@ object frmexport: Tfrmexport
   object btnExport: TButton
     Left = 832
     Height = 38
-    Top = 312
+    Top = 304
     Width = 176
     Caption = 'Start export'
     Enabled = False
@@ -83,8 +83,8 @@ object frmexport: Tfrmexport
   end
   object Memo1: TMemo
     Left = 832
-    Height = 221
-    Top = 372
+    Height = 233
+    Top = 360
     Width = 272
     BorderStyle = bsNone
     ParentFont = False
@@ -92,7 +92,7 @@ object frmexport: Tfrmexport
   end
   object grConversion: TRadioGroup
     Left = 832
-    Height = 116
+    Height = 76
     Top = 180
     Width = 272
     AutoFill = True
@@ -103,9 +103,10 @@ object frmexport: Tfrmexport
     ChildSizing.ShrinkHorizontal = crsScaleChilds
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 1
-    ClientHeight = 86
+    ChildSizing.ControlsPerLine = 2
+    ClientHeight = 46
     ClientWidth = 268
+    Columns = 2
     ItemIndex = 0
     Items.Strings = (
       'Constant'
@@ -117,7 +118,7 @@ object frmexport: Tfrmexport
   object btnCancel: TButton
     Left = 1020
     Height = 38
-    Top = 312
+    Top = 304
     Width = 88
     Caption = 'Cancel'
     OnClick = btnCancelClick
@@ -135,5 +136,16 @@ object frmexport: Tfrmexport
     Font.Name = 'MS Sans Serif'
     ParentFont = False
     TabOrder = 6
+  end
+  object chkServer: TCheckBox
+    Left = 832
+    Height = 29
+    Top = 264
+    Width = 172
+    Caption = 'Server side export'
+    Checked = True
+    OnChange = chkServerChange
+    State = cbChecked
+    TabOrder = 7
   end
 end
