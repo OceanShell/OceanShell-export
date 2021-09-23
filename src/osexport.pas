@@ -116,6 +116,7 @@ begin
      end;
 
     Params:= '{'+
+             '"alias": "COMFORT_V1",'+
              '"time": "'+inttostr(tmark)+'",'+
              '"tables": ['+par_str+'],'+
              '"sql": "'+sql+'",'+
@@ -133,10 +134,11 @@ begin
     Response := TFileStream.Create(user_path+inttostr(tmark)+'.zip', fmCreate);
     try
         try
-            Client.Get('http://158.39.77.222/export', Response);
-         // Client.Get('http://127.0.0.1:5000/export', Response);
+            Client.Get('http://158.39.74.243/export', Response);
+           // Client.Get('http://158.39.77.222/export', Response);
+          //Client.Get('http://127.0.0.1:5000/export', Response);
         except on E:Exception do
-          showmessage('Something bad happened in Post Request : ' + E.Message);
+          showmessage(E.Message);
         end;
     finally
         Client.RequestBody.Free;
