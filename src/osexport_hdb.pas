@@ -368,6 +368,7 @@ writeln(fo,inttostr(Length(DSt)));
 writeln(fo,str);
 end;
 
+
    for i:=0 to High(DSt) do begin
     write(fo,   floattostrF(DSt[i,2],ffFixed,12,1)); //lev_dbar
     write(fo,#9+floattostrF(DSt[i,3],ffFixed,12,1)); //lev_m

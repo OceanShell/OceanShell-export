@@ -954,14 +954,17 @@ begin
      Close;
        SQL.Clear;
        SQL.Add(' SELECT DISTINCT CRUISE.ID, CRUISE_NUMBER ');
-       SQL.Add(' FROM CRUISE, STATION, PLATFORM ');
+       SQL.Add(' FROM CRUISE, STATION, PLATFORM, SOURCE ');
        SQL.Add(' WHERE ');
        SQL.ADD(' (STATION.CRUISE_ID=CRUISE.ID) AND ');
        SQL.Add(' (CRUISE.PLATFORM_ID=PLATFORM.ID) AND ');
+       SQL.Add(' (CRUISE.SOURCE_ID=SOURCE.ID) AND ');
        SQL.Add(' (STATION.QCFLAG=0 OR STATION.QCFLAG>=3) AND ');
        SQL.Add(' (CRUISE.STATIONS_DATABASE>0) AND ');
        SQL.Add(' (CRUISE.DUPLICATE = FALSE) AND ');
        SQL.Add(' (PLATFORM.NAME = '+QuotedStr(cbPlatform.Text)+') ');
+       if cbSource.Text<>'' then
+       SQL.Add(' AND (SOURCE.NAME = '+QuotedStr(cbSource.Text)+') ');
        SQL.Add(' ORDER BY CRUISE_NUMBER ');
      //  showmessage(SQL.Text);
      Qt.Open;

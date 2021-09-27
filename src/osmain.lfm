@@ -4,8 +4,8 @@ object frmosmain: Tfrmosmain
   Top = 117
   Width = 1380
   Caption = 'OceanShell-Export'
-  ClientHeight = 710
-  ClientWidth = 1380
+  ClientHeight = 0
+  ClientWidth = 0
   Color = clBtnFace
   Constraints.MinHeight = 740
   Constraints.MinWidth = 1380
