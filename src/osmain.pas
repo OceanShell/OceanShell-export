@@ -7,8 +7,7 @@ interface
 uses
   SysUtils, Variants, Classes, Graphics, Controls, Forms, ComCtrls, LCLType,
   Menus, Dialogs, ActnList, StdCtrls, IniFiles, ExtCtrls, DateUtils, sqldb, DB,
-  Buttons, DBGrids, Spin, DBCtrls, DateTimePicker, dynlibs, LCLIntf, ComboEx,
-  FileCtrl, EditBtn;
+  Buttons, DBGrids, Spin, DBCtrls, DateTimePicker, dynlibs, LCLIntf, EditBtn;
 
 type
    MapDS=record
@@ -198,9 +197,9 @@ begin
  // showmessage(GlobalPath);
 
 
- { server:='firebird';
+  server:='firebird';
 
-  DBIni:='';
+ { DBIni:='';
   Ini := TIniFile.Create(GetUserDir+'.oceanshell');
   try
     DBIni :=Ini.ReadString('main', 'DBIni',  GlobalPath+'database.ini');
@@ -216,11 +215,10 @@ begin
     Ini.Free;
   end;
 
-  if DBIni='' then halt;
+  if DBIni='' then halt;  }
 
 
-
-  Ini := TIniFile.Create(DBIni);
+  Ini := TIniFile.Create(GlobalPath+'database.ini');
   try
     DBUser :=Ini.ReadString(server, 'user',     'SYSDBA');
     DBPass :=Ini.ReadString(server, 'pass',     'masterkey');
@@ -229,7 +227,6 @@ begin
   finally
     Ini.Free;
   end;
-  }
 
   with frmdm.DBLoader do begin
     {$IFDEF WINDOWS}
@@ -244,8 +241,8 @@ begin
     Enabled:=true;
   end;
 
-  DBHost:= '158.39.74.243';
-  DBPath:= 'COMFORT_v1';
+//  DBHost:= '158.39.74.243';
+//  DBPath:= 'COMFORT_v1';
 
 
 {  DBHost:= 'localhost';
@@ -259,8 +256,8 @@ begin
       Connected:=false;
       HostName:=DBHost;
       DatabaseName:=DBPath;
-    //  UserName:=DBUser;
-    //  Password:=DBPass;
+      UserName:=DBUser;
+      Password:=DBPass;
       Params.Add('WireCompression=true');
       Connected:=true;
     end;
