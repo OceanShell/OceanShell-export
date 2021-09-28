@@ -27,17 +27,18 @@ Type
 DAR=Array of Array of double; //dynmic array of real
 
 Var
-DSt: DAR;
+DSt,DSt_buf: DAR;
 i,j,kt,var_count,stations_count,index :integer;
 platform_id,station_id,cruise_id,source_id,country_id :integer;
 cnt,units_def,units_id,bd,stver,cast,instrument :integer;
 tn,prfn :integer;
-lat,lon,val,val_conv,lev_dbar,lev_m,DF: real;
+lat,lon,val,val_conv,lev_dbar,lev_m,DF,L1,L2 :real;
 fn,tbl :string;
 cruise_number,PI_name,stno,str,units_sname,source_name,platform_name,country_name :string;
 dt :TDateTime;
-st_with_data,ipd_exist,isconverted: boolean;
+st_with_data,ipd_exist,isconverted,one_prf: boolean;
 fo: text;
+label 10;
 
 begin
 
@@ -367,6 +368,36 @@ writeln(fo,inttostr(var_count));
 writeln(fo,inttostr(Length(DSt)));
 writeln(fo,str);
 end;
+
+
+   {...check if only one profile at the station}
+   prfn:=trunc(DSt[0,1]);
+   one_prf:=true;
+   for i:=1 to High(DSt) do if trunc(DSt[i,1])<>prfn then one_prf:=false;
+
+
+   {...sort DSt by depth}
+{S}if one_prf=true then begin
+10:
+{i}for i:=0 to High(DSt)-1 do begin
+    L1:=DSt[i,2];
+    L2:=DSt[i+1,2];
+
+{L}if L1>L2 then begin
+    setlength(DSt_buf,0,0);
+    setlength(DSt_buf, 1, 4+var_count);
+
+{j}for j:=0 to 3+var_count do begin
+    DSt_buf[0,j]:=DSt[i,j];
+    DSt[i,j]:=DSt[i+1,j];
+    DSt[i+1,j]:=DSt_buf[0,j];
+{j}end;
+
+{L}end;
+{i}end;
+    {...find inversion}
+    for i:=0 to High(DSt)-1 do if DSt[i,2]>DSt[i+1,2] then goto 10;
+{S}end;
 
 
    for i:=0 to High(DSt) do begin
